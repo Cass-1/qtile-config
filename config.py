@@ -15,7 +15,7 @@
 #
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-#
+
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -191,37 +191,31 @@ layouts = [
     # layout.VerticalTile(),
     # layout.Zoomy(),
 ]
-
+barscaler = 18
 widget_defaults = dict(
     font="sans",
-    fontsize=12,
+    fontsize=barscaler,
     padding=3,
 )
 extension_defaults = widget_defaults.copy()
 
 decor_purp = {
     "decorations": [
-        RectDecoration(colour="#957bd1", radius=3, filled=True, padding=3, group=True)
+        RectDecoration(colour="#957bd1", radius=3, filled=True, padding=barscaler/4, group=True)
     ],
-    "padding": 7,
+    "padding": barscaler/1.7142,
 }
 decor_pink = {
     "decorations": [
-        RectDecoration(colour='#D17B8C', radius=3, filled=True, padding=1, group=True)
+        RectDecoration(colour='#D17B8C', radius=3, filled=True, padding=barscaler/4, group=True)
     ],
-    "padding": 8,
-}
-decor_pink2 = {
-    "decorations": [
-        RectDecoration(colour='#D17B8C', radius=3, filled=True, padding=3, group=True)
-    ],
-    "padding": 7,
+    "padding":  barscaler/1.7142,
 }
 decor_green = {
     "decorations": [
-        RectDecoration(colour='#83A439', radius=3, filled=True, padding=3, group=True)
+        RectDecoration(colour='#83A439', radius=3, filled=True, padding=barscaler/4, group=True)
     ],
-    "padding": 7,
+    "padding":  barscaler/1.7142,
 }
 
 screens = [
@@ -230,7 +224,7 @@ screens = [
             [
                 widget.GroupBox(
                     hide_unused=False,
-                    fontsize=20,
+                    fontsize=30,
                     active='FFFFFF',
                     borderwidth=1,
                     highlight_method='line',
@@ -262,7 +256,7 @@ screens = [
                     format='{char} {percent:2.0%} {hour:d}:{min:02d}',
                     **decor_pink2,
                 ),
-                widget.ThermalZone(**decor_pink2),
+                widget.ThermalZone(**decor_pink),
                 widget.Sep(linewidth=2),
                 widget.Systray(),
                 widget.Sep(linewidth=2),
@@ -271,7 +265,7 @@ screens = [
                 widget.Sep(linewidth=2),
                 widget.Clock(format="%Y-%m-%d %a %I:%M %p",  **decor_purp),
             ],
-            24,
+            2*barscaler,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
             # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
             background='#3a383d',
