@@ -224,13 +224,14 @@ screens = [
             [
                 widget.GroupBox(
                     hide_unused=False,
+                    highlight_color = ['282828', 'a888f7'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
                     fontsize=30,
-                    active='FFFFFF',
+                    active='FFFFFF', # color that active windows make the text
                     borderwidth=1,
                     highlight_method='line',
-                    inactive='#666565',
+                    inactive='#666565', # color that inactive windows make the text
                     # this_current_screen_border='#714acf', 
-                    this_current_screen_border='#a888f7', # norder or line color for group on this screen when unfocused
+                    this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
                     other_current_screen_border='#a68fdb',
                     other_screen_border='#a68fdb',
                     this_screen_border='#a68fdb',
