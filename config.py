@@ -294,6 +294,20 @@ def try_again():
     qtile.cmd_spawn("firefox")
     qtile.cmd_spawn("anki")
 
+def spawn_if_empty(string: str, app: str):
+    # check if current group has any windows, note i don't think that there is a "current" group in general, there may be one for each screen
+        # could do this with group.info()
+    # if not spawn an application
+    f = open("/home/dahle/Desktop/Personal/qtile.txt", "w")
+    a = qtile.group.info() # doesn't work bc of how lazy functions work
+    f.write(str(a))
+    f.close()
+    # for window in group.info.windows:
+    #   if app is a substring of window
+    #       stop 
+    # spawn app
+    return  # placeholder
+
 #NOTE: Screens
 screens = [
     Screen(
@@ -328,6 +342,7 @@ screens = [
                 widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
                 widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
                 widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
+                widget.TextBox(text="a",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: spawn_if_empty("test","test")}),
                 widget.Prompt(),
                 # widget.WindowName(),
                 widget.Chord(
