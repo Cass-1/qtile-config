@@ -24,13 +24,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from libqtile import bar, layout, widget, hook
+from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 from qtile_extras.widget.decorations import RectDecoration
 from qtile_extras import widget
-import subprocess
+import subprocess, os,time
+
+#NOTE: Keybindings
 
 mod = "Mod4"
 terminal = guess_terminal()
@@ -62,8 +64,8 @@ keys = [
     # Unsplit = 1 window displayed, like Max layout, but still with
     # multiple stack panes
     Key(
-        [mod, "shift"],
-        "Return",
+        [mod],
+        "s",
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack",
     ),
@@ -79,19 +81,51 @@ keys = [
     Key([],"F4", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
     Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([mod], "f", lazy.window.toggle_floating()),
+    # this is for a widget to call
+    Key([mod, "control", "mod1"], "r", lazy.group["7"].toscreen(), lazy.spawn("discord"))
 ]
+# to swith back to last group
+def latest_group(qtile):
+    qtile.current_screen.set_group(qtile.current_screen.previous_group)
 
+keys += [Key([mod], "p", lazy.function(latest_group))]
+
+#HACK: move_next_screen2(), cool function that when called swaps the groups on screens
+
+# def warp_cursor_here_win(win):
+#     if win is not None:
+#         win.window.warp_pointer(win.width // 2, win.height // 2)
+
+# def move_next_screen2():
+#     @lazy.function
+#     def _move_next_screen2(qtile):
+#         if len(qtile.screens) != 2: return
+#         i = qtile.screens.index(qtile.current_screen)
+#         j = 0 if i == 1 else 1
+
+#         if qtile.current_group:
+#             group = qtile.current_group
+#             # logger.warning(f'Move group "{group.name}" from screen {i}->{j}')
+#             qtile.focus_screen(j)
+#             time.sleep(2)
+#             group.cmd_toscreen()
+#             warp_cursor_here_win(group.current_window)
+#             time.sleep(2)
+
+#     return _move_next_screen2
+
+#NOTE: Groups
 group_names = [
    ("1", {"label": ""}), # Hack Nerd Font
-   ("2", {"label": "•"}),
-   ("3", {"label": "•"}), # Hack Nerd Font
-   ("4", {"label": "•"}),
-   ("5", {"label": "•"}),
-   ("6", {"label": "•"}),
-   ("7", {"label": "•"}),
-   ("8", {"label": ""}),
-   ("9", {"label": ""}),
-   ("0", {"label": ""}),
+   ("2", {"label": ""}), # Hack Nerd Font
+   ("3", {"label": ""}), # Hack Nerd Font
+   ("4", {"label": "•"}), # Hack Nerd Font
+   ("5", {"label": "•"}), # Hack Nerd Font
+   ("6", {"label": "•"}), # Hack Nerd Font
+   ("7", {"label": "󰙯"}), # Not Sure, but was from a nerd font
+   ("8", {"label": "•"}), # Hack Nerd Font
+   ("9", {"label": "•"}), # Hack Nerd Font
+   ("0", {"label": "•"}), # Hack Nerd Font
    # ("1",  {"label": ""}),
    # ("2 ", {"label": ""}),
    # ("3 ", {"label": ""}),
@@ -128,16 +162,21 @@ group_names = [
    # ("7 ", {"label": ""}),
    # ("8 ", {"label": ""}),
    # ("9 ", {"label": ""}),
-]                    
+]
 
+#HACK: Hack For Groups
+codeoss_wn = 2
+discord_wn = 6
 groups = [Group(name, **kwargs) for name, kwargs in group_names]
-for i, (name, kwargs) in enumerate(group_names, 1):
+for g in groups:
     keys.append(
-        Key([mod], name, lazy.group[name].toscreen())
+        Key([mod], g.name, lazy.group[g.name].toscreen())
     )
     keys.append(
-        Key([mod, "shift"], name, lazy.window.togroup(name))
+        Key([mod, "shift"], g.name, lazy.window.togroup(g.name))
     )
+groups[codeoss_wn].matches= [Match(wm_class="code-oss")]
+groups[discord_wn].matches= [Match(wm_class="discord")]
 
 # for i, (name, kwargs) in enumerate(group_names, 1):
 #     # mod1 + letter of group = switch to group
@@ -176,6 +215,7 @@ for i, (name, kwargs) in enumerate(group_names, 1):
 #         ]
 #     )
 
+#NOTE: Layouts
 layouts = [
     layout.Columns(margin_on_single=6, insert_position=1, border_focus_stack=["#a68fdb"],border_focus="#a68fdb",border_normal="#14023b", border_width=4, margin=6),
     # layout.MonadTall(border_focus="#edd6ff",border_normal="#14023b", border_width=4, margin=4),
@@ -191,6 +231,9 @@ layouts = [
     # layout.VerticalTile(),
     # layout.Zoomy(),
 ]
+
+
+#HACK: My Colors
 barscaler = 18
 widget_defaults = dict(
     font="sans",
@@ -211,13 +254,47 @@ decor_pink = {
     ],
     "padding":  barscaler/1.7142,
 }
+# the pink2 color is slightly changed so icons in it will have their own group
+# if the color is the same as pink it is treated as the same gruop as pink
+decor_pink2 = {
+    "decorations": [
+        RectDecoration(colour='#D17B8B', radius=3, filled=True, padding=barscaler/4, group=True)
+    ],
+    "padding":  barscaler/1.7142,
+}
 decor_green = {
     "decorations": [
         RectDecoration(colour='#83A439', radius=3, filled=True, padding=barscaler/4, group=True)
     ],
     "padding":  barscaler/1.7142,
 }
+decor_green2 = {
+    "decorations": [
+        RectDecoration(colour='#83A438', radius=3, filled=True, padding=barscaler/4, group=True)
+    ],
+    "padding":  barscaler/1.7142,
+}
+decor_gray = {
+    "decorations": [
+        RectDecoration(colour='#9B9B9B', radius=3, filled=True, padding=barscaler/4, group=True)
+    ],
+    "padding":  barscaler/1.7142,
+}
 
+# for some reason this script isn't working, refer to script
+# def my_func():
+#     script = os.path.expanduser('/home/dahle/Desktop/Scripts/test.sh')
+#     subprocess.call(script)
+
+#TODO: get this working
+# i can't seem to figure out how to move to a screen based on a widget inside a function, if i can do this i can have a function
+# that would switch to my "firefox" screen and then spawn a firefox instance
+# widget.TextBox(text="a",fontsize=30,**decor_green, mouse_callbacks={"Button1": try_again()}),
+def try_again():
+    qtile.cmd_spawn("firefox")
+    qtile.cmd_spawn("anki")
+
+#NOTE: Screens
 screens = [
     Screen(
         top=bar.Bar(
@@ -230,16 +307,28 @@ screens = [
                     borderwidth=1,
                     highlight_method='line',
                     inactive='#666565', # color that inactive windows make the text
-                    # this_current_screen_border='#714acf', 
+                    # this_current_screen_border='#714acf',
                     this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
                     other_current_screen_border='#a68fdb',
-                    other_screen_border='#a68fdb',
+                    other_screen_border='#FFFFFF',
                     this_screen_border='#a68fdb',
 
 
                     ),
                 widget.Sep(),
                 widget.CurrentLayout(**decor_pink),
+                widget.Sep(linewidth=2),
+                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("firefox")}),
+                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
+                # widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn([terminal, "-e", "nvim"])}),
+                widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("neovide")}),
+                widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("discord")}),
+                widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("code")}),
+                widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
+                widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
+                widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
+                widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
+                widget.TextBox(text="b",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"r")}),
                 widget.Prompt(),
                 # widget.WindowName(),
                 widget.Chord(
@@ -255,30 +344,33 @@ screens = [
                 widget.Spacer(),
                 widget.Battery(
                     format='{char} {percent:2.0%} {hour:d}:{min:02d}',
-                    **decor_pink2,
-                ),
+                    **decor_pink,
+                    ),
                 widget.ThermalZone(**decor_pink),
+                widget.TextBox(text="󰍶",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
+                widget.TextBox(text="󰤄",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
                 widget.Sep(linewidth=2),
                 widget.Systray(),
                 widget.Sep(linewidth=2),
                 widget.CheckUpdates(distro='Arch', no_update_string='Update: 0', **decor_green),
                 widget.Volume(**decor_green),
                 widget.Sep(linewidth=2),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p",  **decor_purp),
+                widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp),
             ],
             2*barscaler,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
             # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
             background='#3a383d',
         ),
-        
+
         # right=bar.Gap(10),
         # left=bar.Gap(10),
         # bottom=bar.Gap(10)
-        
+
     ),
 ]
 
+#NOTE: Floating Layouts
 # Drag floating layouts.
 mouse = [
     Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
@@ -301,7 +393,9 @@ floating_layout = layout.Floating(
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
-    ]
+        Match(wm_class="yad")  # yad
+    ],
+    border_focus = "a68fdb",border_normal="#14023b",border_width=6
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
@@ -324,6 +418,9 @@ wl_input_rules = None
 # java that happens to be on java's whitelist.
 wmname = "LG3D"
 
+
+# Don't use tweak_float in a client_new hook. It will crash qtile.
+#window.tweak_float(x=660, y=400, w=600, h=20)
 # fix to get plank working
 # https://forum.garudalinux.org/t/qtile-and-plank-doesnt-work-well-together/19891/5
 # @hook.subscribe.startup_once
@@ -334,3 +431,7 @@ wmname = "LG3D"
 # def plank_reload(_window):
 #     subprocess.Popen(["/home/dahle/.local/bin/plank-launcher", "show"])
 
+# when a new window is made, go to that window
+# @hook.subscribe.group_window_add
+# def switchtogroup(group, window):
+#   group.cmd_toscreen()
