@@ -54,13 +54,17 @@ def app_in_group(app: str):
         # could do this with group.info()
     # if not spawn an application
 # checks if an application is open anywhere, if not opens it, if it is goes to it
+def find_current_group():
+    return qtile.current_screen.group.name
+
 def find_or_run_group_based(app, wm_class,group_name):
     def __inner(qtile):
 
         f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
+        current_group = find_current_group()
         # f.write(str(qtile.groups_map[group_name].windows))
         # # Get the window objects from windows_map
-        for window in qtile.groups_map[group_name].windows:
+        for window in qtile.groups_map[current_group].windows:
             f.write(str(window))
             # Check if the window matches your desired class
             if hasattr(window, "cmd_match") and window.cmd_match(Match(wm_class=wm_class)):
@@ -79,6 +83,7 @@ def find_or_run_group_based(app, wm_class,group_name):
         qtile.cmd_spawn(app)
         f.close()
     return __inner
+# https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 def find_or_run(app, wm_class):
     def __inner(qtile):
 
@@ -157,6 +162,7 @@ keys = [
     # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
     Key([mod, "control", "mod1"], "b", lazy.function(find_or_run("firefox","firefox"))),
     Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
+    Key([mod], "b", lazy.function(find_current_group())),
 ]
 # to swith back to last group
 def latest_group(qtile):
