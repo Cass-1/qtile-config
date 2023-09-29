@@ -24,6 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from types import NoneType
 from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
@@ -33,13 +34,21 @@ from qtile_extras import widget
 import subprocess, os,time
 
 #NOTE: Helper Functions
+
+# given an application name, search the current group's window list for that application name
+# if found return 1, else return 0
 def app_in_group(app: str):
+    # f = open("/home/dahle/Desktop/Personal/qtile.txt","a")
     group_windows = qtile.current_screen.group.info()['windows']
+    # f.write(str(len(group_windows)))
     for window in group_windows:
-        if app in window.lower():
-            return 1
-    return 0
-    # qtile.cmd_spawn("firefox")
+        if window is not None and app in window.lower():
+            # f.write("fond ya")
+            # f.close()
+            qtile.cmd_spawn(app)
+    # f.write("didn't finda ya")
+    # f.close()
+    qtile.cmd_spawn(terminal)
     # check if current group has any windows, note i don't think that there is a "current" group in general, there may be one for each screen
         # could do this with group.info()
     # if not spawn an application
@@ -93,9 +102,11 @@ keys = [
     Key([],"F4", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
     Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([mod], "f", lazy.window.toggle_floating()),
-    Key([mod], "z", lazy.spawn("anki") if(app_in_group("firefox") is 1)else lazy.spawn("firefox")),
     # this is for a widget to call
-    Key([mod, "control", "mod1"], "r", lazy.group["7"].toscreen(), lazy.spawn("discord"))
+    Key([mod, "control", "mod1"], "a", lazy.group["7"].toscreen(), lazy.spawn("discord")),
+    # open firefox if not found in current group, called by widget
+    # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
+    Key([mod, "control", "mod1"], "b", lambda: app_in_group("firefox"))
 ]
 # to swith back to last group
 def latest_group(qtile):
@@ -336,17 +347,16 @@ screens = [
                 widget.Sep(),
                 widget.CurrentLayout(**decor_pink),
                 widget.Sep(linewidth=2),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("firefox")}),
+                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control", "mod1"], "b")}),
                 widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
                 # widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn([terminal, "-e", "nvim"])}),
                 widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("neovide")}),
-                widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"r")}),
+                widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"a")}),
                 widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("code")}),
                 widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
                 widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
                 widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
                 widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
-                widget.TextBox(text="a",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: spawn_if_empty("test","test")}),
                 widget.Prompt(),
                 # widget.WindowName(),
                 widget.Chord(
