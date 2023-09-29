@@ -54,18 +54,25 @@ def app_in_group(app: str):
         # could do this with group.info()
     # if not spawn an application
 # checks if an application is open anywhere, if not opens it, if it is goes to it
-def find_current_group():
-    return qtile.current_screen.group.name
+def get_current_group():
+    return qtile.current_screen.group
 
+def find_or_run_current_group(app, wm_class):
+    current_group = get_current_group()
+    current_group = current_group.name
+    f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
+    f.write("hello there")
+    f.write(str(current_group))
+    f.close()
+    return find_or_run_group_based(app, wm_class, current_group)
 def find_or_run_group_based(app, wm_class,group_name):
     def __inner(qtile):
 
-        f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
-        current_group = find_current_group()
+        # f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
         # f.write(str(qtile.groups_map[group_name].windows))
         # # Get the window objects from windows_map
-        for window in qtile.groups_map[current_group].windows:
-            f.write(str(window))
+        for window in qtile.groups_map[group_name].windows:
+            # f.write(str(window))
             # Check if the window matches your desired class
             if hasattr(window, "cmd_match") and window.cmd_match(Match(wm_class=wm_class)):
 
@@ -76,12 +83,12 @@ def find_or_run_group_based(app, wm_class,group_name):
                 window.focus(False)
 
                 # Exit the function
-                f.close()
+                # f.close()
                 return
 
-        # If we're here, the app wasn't found so we launch it
+        # If we're here, the app wasn't found in the group name, so switch to that screen and spawn it
+        qtile.current_screen.toggle_group(qtile.groups_map[group_name])
         qtile.cmd_spawn(app)
-        f.close()
     return __inner
 # https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 def find_or_run(app, wm_class):
@@ -162,7 +169,7 @@ keys = [
     # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
     Key([mod, "control", "mod1"], "b", lazy.function(find_or_run("firefox","firefox"))),
     Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
-    Key([mod], "b", lazy.function(find_current_group())),
+    Key([mod], "b", lazy.function(find_or_run_current_group("firefox","firefox"))),
 ]
 # to swith back to last group
 def latest_group(qtile):
