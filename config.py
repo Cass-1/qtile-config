@@ -55,17 +55,17 @@ def app_in_group(app: str):
     # if not spawn an application
 
 # checks if an application is open anywhere, if not opens it, if it is goes to it
-def get_current_group():
-    return qtile.current_screen.group
+# def get_current_group():
+#     return qtile.current_screen.group
 
-def find_or_run_current_group(app, wm_class):
-    current_group = get_current_group()
-    current_group = current_group.name
-    f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
-    f.write("hello there")
-    f.write(str(current_group))
-    f.close()
-    return find_or_run_group_based(app, wm_class, current_group)
+# def find_or_run_current_group(app, wm_class):
+#     current_group = get_current_group()
+#     current_group = current_group.name
+#     f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
+#     f.write("hello there")
+#     f.write(str(current_group))
+#     f.close()
+#     return find_or_run_group_based(app, wm_class, current_group)
 
 # if an application is not in the specified group, go to that group and open the application, otherwise go to that group and focus that application
 #TODO: Would like to add a mouse warping feature
@@ -175,7 +175,7 @@ keys = [
     Key([mod, "control", "mod1"], "b", lazy.function(find_or_run_group_based("thunderbird","thunderbird", "4"))),
     Key([mod, "control", "mod1"], "c", lazy.function(find_or_run_group_based("code","code-oss", "2"))),
     Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
-    Key([mod], "b", lazy.function(find_or_run_current_group("firefox","firefox"))),
+    # Key([mod], "b", lazy.function(find_or_run_current_group("firefox","firefox"))),
 ]
 # to swith back to last group
 def latest_group(qtile):
