@@ -32,6 +32,18 @@ from qtile_extras.widget.decorations import RectDecoration
 from qtile_extras import widget
 import subprocess, os,time
 
+#NOTE: Helper Functions
+def app_in_group(app: str):
+    group_windows = qtile.current_screen.group.info()['windows']
+    for window in group_windows:
+        if app in window.lower():
+            return 1
+    return 0
+    # qtile.cmd_spawn("firefox")
+    # check if current group has any windows, note i don't think that there is a "current" group in general, there may be one for each screen
+        # could do this with group.info()
+    # if not spawn an application
+
 #NOTE: Keybindings
 
 mod = "Mod4"
@@ -81,6 +93,7 @@ keys = [
     Key([],"F4", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
     Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([mod], "f", lazy.window.toggle_floating()),
+    Key([mod], "z", lazy.spawn("anki") if(app_in_group("firefox") is 1)else lazy.spawn("firefox")),
     # this is for a widget to call
     Key([mod, "control", "mod1"], "r", lazy.group["7"].toscreen(), lazy.spawn("discord"))
 ]
@@ -175,8 +188,6 @@ for g in groups:
     keys.append(
         Key([mod, "shift"], g.name, lazy.window.togroup(g.name))
     )
-groups[codeoss_wn].matches= [Match(wm_class="code-oss")]
-groups[discord_wn].matches= [Match(wm_class="discord")]
 
 # for i, (name, kwargs) in enumerate(group_names, 1):
 #     # mod1 + letter of group = switch to group
@@ -294,14 +305,7 @@ def try_again():
     qtile.cmd_spawn("firefox")
     qtile.cmd_spawn("anki")
 
-def spawn_if_empty(string: str, app: str):
-    # check if current group has any windows, note i don't think that there is a "current" group in general, there may be one for each screen
-        # could do this with group.info()
-    # if not spawn an application
-    f = open("/home/dahle/Desktop/Personal/qtile.txt", "w")
-    a = qtile.group.info() # doesn't work bc of how lazy functions work
-    f.write(str(a))
-    f.close()
+
     # for window in group.info.windows:
     #   if app is a substring of window
     #       stop 
