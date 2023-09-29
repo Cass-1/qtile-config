@@ -53,6 +53,7 @@ def app_in_group(app: str):
     # check if current group has any windows, note i don't think that there is a "current" group in general, there may be one for each screen
         # could do this with group.info()
     # if not spawn an application
+
 # checks if an application is open anywhere, if not opens it, if it is goes to it
 def get_current_group():
     return qtile.current_screen.group
@@ -65,14 +66,17 @@ def find_or_run_current_group(app, wm_class):
     f.write(str(current_group))
     f.close()
     return find_or_run_group_based(app, wm_class, current_group)
+
+# if an application is not in the specified group, go to that group and open the application, otherwise go to that group and focus that application
+#TODO: Would like to add a mouse warping feature
+# you can find the wm_class by using the xprop command in terminal
 def find_or_run_group_based(app, wm_class,group_name):
+
     def __inner(qtile):
 
-        # f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
-        # f.write(str(qtile.groups_map[group_name].windows))
         # # Get the window objects from windows_map
         for window in qtile.groups_map[group_name].windows:
-            # f.write(str(window))
+
             # Check if the window matches your desired class
             if hasattr(window, "cmd_match") and window.cmd_match(Match(wm_class=wm_class)):
 
@@ -80,16 +84,17 @@ def find_or_run_group_based(app, wm_class,group_name):
                 qtile.current_screen.set_group(window.group)
 
                 # Focus the window
-                window.focus(False)
-
-                # Exit the function
-                # f.close()
+                #WARNING: I don't know if this value should be true or false, i switched it to true
+                window.focus(True)
                 return
 
         # If we're here, the app wasn't found in the group name, so switch to that screen and spawn it
-        qtile.current_screen.toggle_group(qtile.groups_map[group_name])
+        # qtile.current_screen.toggle_group(qtile.groups_map[group_name])
+        qtile.current_screen.set_group(qtile.groups_map[group_name])
         qtile.cmd_spawn(app)
+
     return __inner
+
 # https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 def find_or_run(app, wm_class):
     def __inner(qtile):
@@ -164,10 +169,10 @@ keys = [
     Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([mod], "f", lazy.window.toggle_floating()),
     # this is for a widget to call
-    Key([mod, "control", "mod1"], "a", lazy.group["7"].toscreen(), lazy.spawn("discord")),
+    Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
     # open firefox if not found in current group, called by widget
     # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
-    Key([mod, "control", "mod1"], "b", lazy.function(find_or_run("firefox","firefox"))),
+    Key([mod, "control", "mod1"], "b", lazy.function(find_or_run_group_based("thunderbird","thunderbird", "4"))),
     Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
     Key([mod], "b", lazy.function(find_or_run_current_group("firefox","firefox"))),
 ]
@@ -205,11 +210,11 @@ keys += [Key([mod], "p", lazy.function(latest_group))]
 group_names = [
    ("1", {"label": ""}), # Hack Nerd Font
    ("2", {"label": ""}), # Hack Nerd Font
-   ("3", {"label": ""}), # Hack Nerd Font
-   ("4", {"label": "•"}), # Hack Nerd Font
-   ("5", {"label": "•"}), # Hack Nerd Font
+   ("3", {"label": "•"}), # Hack Nerd Font
+   ("4", {"label": "󰨲"}), # Hack Nerd Font
+   ("5", {"label": "󰙯"}), # Hack Nerd Font
    ("6", {"label": "•"}), # Hack Nerd Font
-   ("7", {"label": "󰙯"}), # Not Sure, but was from a nerd font
+   ("7", {"label": "•"}), # Not Sure, but was from a nerd font
    ("8", {"label": "•"}), # Hack Nerd Font
    ("9", {"label": "•"}), # Hack Nerd Font
    ("0", {"label": "•"}), # Hack Nerd Font
@@ -410,12 +415,13 @@ screens = [
                 widget.Sep(),
                 widget.CurrentLayout(**decor_pink),
                 widget.Sep(linewidth=2),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control", "mod1"], "b")}),
+                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.spawn("firefox")}),
                 widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
                 # widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn([terminal, "-e", "nvim"])}),
                 widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("neovide")}),
                 widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"a")}),
                 widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("code")}),
+                widget.TextBox(text="󰨲",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"b")}),
                 widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
                 widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
                 widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
