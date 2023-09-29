@@ -37,6 +37,7 @@ import subprocess, os,time
 
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
+# not working, seems to only run the conidtional that i put in the keybind when the config is reloaded (line 109)
 def app_in_group(app: str):
     # f = open("/home/dahle/Desktop/Personal/qtile.txt","a")
     group_windows = qtile.current_screen.group.info()['windows']
@@ -52,6 +53,54 @@ def app_in_group(app: str):
     # check if current group has any windows, note i don't think that there is a "current" group in general, there may be one for each screen
         # could do this with group.info()
     # if not spawn an application
+# checks if an application is open anywhere, if not opens it, if it is goes to it
+def find_or_run_group_based(app, wm_class,group_name):
+    def __inner(qtile):
+
+        f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
+        # f.write(str(qtile.groups_map[group_name].windows))
+        # # Get the window objects from windows_map
+        for window in qtile.groups_map[group_name].windows:
+            f.write(str(window))
+            # Check if the window matches your desired class
+            if hasattr(window, "cmd_match") and window.cmd_match(Match(wm_class=wm_class)):
+
+                # Switch to the group where the window is
+                qtile.current_screen.set_group(window.group)
+
+                # Focus the window
+                window.focus(False)
+
+                # Exit the function
+                f.close()
+                return
+
+        # If we're here, the app wasn't found so we launch it
+        qtile.cmd_spawn(app)
+        f.close()
+    return __inner
+def find_or_run(app, wm_class):
+    def __inner(qtile):
+
+        # Get the window objects from windows_map
+        for window in qtile.windows_map.values():
+
+            # Check if the window matches your desired class
+            if hasattr(window, "cmd_match") and window.cmd_match(Match(wm_class=wm_class)):
+
+                # Switch to the group where the window is
+                qtile.current_screen.set_group(window.group)
+
+                # Focus the window
+                window.focus(False)
+
+                # Exit the function
+                return
+
+        # If we're here, the app wasn't found so we launch it
+        qtile.cmd_spawn(app)
+
+    return __inner
 
 #NOTE: Keybindings
 
@@ -106,7 +155,8 @@ keys = [
     Key([mod, "control", "mod1"], "a", lazy.group["7"].toscreen(), lazy.spawn("discord")),
     # open firefox if not found in current group, called by widget
     # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
-    Key([mod, "control", "mod1"], "b", lambda: app_in_group("firefox"))
+    Key([mod, "control", "mod1"], "b", lazy.function(find_or_run("firefox","firefox"))),
+    Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
 ]
 # to swith back to last group
 def latest_group(qtile):
