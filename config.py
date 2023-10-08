@@ -65,13 +65,17 @@ def get_current_group():
 # NOTE: Lazy functions or functions that call lazy functions are given the qtile argument, thats why i was
 # getting find_or_run_current_group() takes 2 positional arguments but 3 were given
 @lazy.function
-def find_or_run_current_group(qtile, app_name, wm_class):
-    current_group = get_current_group()
-    current_group = current_group.name
-    f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
-    # f.write("hello there\n")
-    f.write(str(current_group))
-    f.close()
+def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
+    if (group_name is None):
+        current_group = get_current_group()
+        current_group = current_group.name
+        f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
+        # f.write("hello there\n")
+        f.write(str(current_group))
+        f.close()
+    else:
+        current_group = group_name
+
     for window in qtile.groups_map[current_group].windows:
 
         # Check if the window matches your desired class
@@ -85,10 +89,9 @@ def find_or_run_current_group(qtile, app_name, wm_class):
             window.focus(True)
             return
 
-    # If we're here, the app wasn't found in the group name, so switch to that screen and spawn it
-    # qtile.current_screen.toggle_group(qtile.groups_map[group_name])
+    # If we're here, the app wasn't found in the group name, so switch to that group and spawn it
     qtile.current_screen.set_group(qtile.groups_map[current_group])
-    qtile.cmd_spawn(app_name)
+    qtile.spawn(app_name)
 
 #TODO: Would like to add a mouse warping feature
 # you can find the wm_class by using the xprop command in terminal
@@ -201,7 +204,7 @@ keys = [
     Key([mod, "control", "mod1"], "b", lazy.function(find_or_run_group_based("thunderbird","thunderbird", "4"))),
     Key([mod, "control", "mod1"], "c", lazy.function(find_or_run_group_based("code","code-oss", "2"))),
     Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
-    Key([mod], "b", find_or_run_current_group("firefox", "firefox")),
+    Key([mod], "b", open_solitary_instance("firefox", "firefox")),
 ]
 # to swith back to last group
 def latest_group(qtile):
