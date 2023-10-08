@@ -55,11 +55,13 @@ def app_in_group(qtile, app: str):
         # could do this with group.info()
     # if not spawn an application
 
-# checks if an application is open anywhere, if not opens it, if it is goes to it
 def get_current_group():
+    """
+    returns the name of the current group
+    """
     return qtile.current_screen.group
 
-def find_or_run_current_group(app_name :str, wm_class :str):
+def find_or_run_current_group(app_name, wm_class):
     current_group = get_current_group()
     current_group = current_group.name
     f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
@@ -75,12 +77,11 @@ def find_or_run_group_based(app, wm_class,group_name):
     if an application is not in the specified group, go to that group and open the application, otherwise go to that group and focus that application
     """
     def __inner(qtile):
-
         # # Get the window objects from windows_map
         for window in qtile.groups_map[group_name].windows:
 
             # Check if the window matches your desired class
-            if hasattr(window, "cmd_match") and window.cmd_match(Match(wm_class=wm_class)):
+            if hasattr(window, "match") and window.match(Match(wm_class=wm_class)):
 
                 # Switch to the group where the window is
                 qtile.current_screen.set_group(window.group)
@@ -108,7 +109,7 @@ def find_or_run(app, wm_class):
         for window in qtile.windows_map.values():
 
             # Check if the window matches your desired class
-            if hasattr(window, "cmd_match") and window.cmd_match(Match(wm_class=wm_class)):
+            if hasattr(window, "match") and window.match(Match(wm_class=wm_class)):
 
                 # Switch to the group where the window is
                 qtile.current_screen.set_group(window.group)
@@ -180,7 +181,7 @@ keys = [
     Key([mod, "control", "mod1"], "b", lazy.function(find_or_run_group_based("thunderbird","thunderbird", "4"))),
     Key([mod, "control", "mod1"], "c", lazy.function(find_or_run_group_based("code","code-oss", "2"))),
     Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
-    Key([mod], "b", lazy.function(find_or_run_current_group,"firefox")),
+    Key([mod], "b", lazy.function(find_or_run_current_group("firefox", "firefox"))),
 ]
 # to swith back to last group
 def latest_group(qtile):
