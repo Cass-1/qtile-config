@@ -69,7 +69,7 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
     """
     opens a solitary instance of an application in the specified group, if no group is specified the current group is used
     Switches to specified group and if it is not open in that group, open it and focus it, if that application is open focus it
-    TODO: The focusing on the window doesn't work yet
+    TODO: The focusing on the window doesn't work yet, I think I need a mouse warp to do this
     """
     if (group_name is None):
         current_group = get_current_group()
