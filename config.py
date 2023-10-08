@@ -61,6 +61,11 @@ def get_current_group():
     """
     return qtile.current_screen.group
 
+def warp_cursor_here_win(win):
+    if win is not None:
+        win.window.warp_pointer(win.width // 2, win.height // 2)
+
+
 # NOTE: Lazy functions or functions that call lazy functions are given the qtile argument, thats why i was
 # getting find_or_run_current_group() takes 2 positional arguments but 3 were given
 # NOTE: This code was partially inspired by https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
@@ -88,7 +93,8 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
             qtile.current_screen.set_group(window.group)
 
             # Focus the window
-            window.focus(False)
+            window.focus(True)
+
             return
 
     # If we're here, the app wasn't found in the group name, so switch to that group and spawn it
@@ -177,6 +183,7 @@ keys = [
     # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
     Key([mod, "control", "mod1"], "b", open_solitary_instance("thunderbird", "thunderbird", "4")),
     Key([mod, "control", "mod1"], "c", open_solitary_instance("code","code-oss", "2")),
+    Key([mod, "control", "mod1"], "d", open_solitary_instance("firefox","firefox")),
     Key([mod], "t", open_solitary_instance("firefox", "firefox", "2")),
     Key([mod], "b", open_solitary_instance("firefox", "firefox")),
 ]
@@ -419,7 +426,7 @@ screens = [
                 widget.Sep(),
                 widget.CurrentLayout(**decor_pink),
                 widget.Sep(linewidth=2),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.spawn("firefox")}),
+                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control", "mod1"], "d")}),
                 widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
                 # widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn([terminal, "-e", "nvim"])}),
                 widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("neovide")}),
