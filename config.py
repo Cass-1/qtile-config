@@ -37,7 +37,8 @@ import subprocess, os,time
 
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
-# not working, seems to only run the conidtional that i put in the keybind when the config is reloaded (line 109)
+# not working, seems to only run the conidtional that i put in the keybind when
+# the config is reloaded (line 109)
 def app_in_group(qtile, app: str):
     # f = open("/home/dahle/Desktop/Personal/qtile.txt","a")
     group_windows = qtile.current_screen.group.info()['windows']
@@ -58,19 +59,21 @@ def app_in_group(qtile, app: str):
 def get_current_group():
     return qtile.current_screen.group
 
-def find_or_run_current_group(app, wm_class):
+def find_or_run_current_group(app_name :str, wm_class :str):
     current_group = get_current_group()
     current_group = current_group.name
     f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
-    f.write("hello there")
+    # f.write("hello there\n")
     f.write(str(current_group))
     f.close()
-    return find_or_run_group_based(app, wm_class, current_group)
+    return find_or_run_group_based(app_name, wm_class, current_group)
 
-# if an application is not in the specified group, go to that group and open the application, otherwise go to that group and focus that application
 #TODO: Would like to add a mouse warping feature
 # you can find the wm_class by using the xprop command in terminal
 def find_or_run_group_based(app, wm_class,group_name):
+    """
+    if an application is not in the specified group, go to that group and open the application, otherwise go to that group and focus that application
+    """
     def __inner(qtile):
 
         # # Get the window objects from windows_map
@@ -96,6 +99,9 @@ def find_or_run_group_based(app, wm_class,group_name):
 
 # https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 def find_or_run(app, wm_class):
+    """
+    Checks if an application is open in any of the windows, if it is focus the applicaiton, otherwise open the application.
+    """
     def __inner(qtile):
 
         # Get the window objects from windows_map
@@ -174,7 +180,7 @@ keys = [
     Key([mod, "control", "mod1"], "b", lazy.function(find_or_run_group_based("thunderbird","thunderbird", "4"))),
     Key([mod, "control", "mod1"], "c", lazy.function(find_or_run_group_based("code","code-oss", "2"))),
     Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
-    # Key([mod], "b", lazy.function(find_or_run_current_group("firefox","firefox"))),
+    Key([mod], "b", lazy.function(find_or_run_current_group,"firefox")),
 ]
 # to swith back to last group
 def latest_group(qtile):
