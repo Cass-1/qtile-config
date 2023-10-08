@@ -60,12 +60,17 @@ def get_current_group():
     returns the name of the current group
     """
     return qtile.current_screen.group
-# NOTE: Only updating current group on qtile reload, that means this function is being evaluated
-# and then passed into the lazy function
+
 # NOTE: Lazy functions or functions that call lazy functions are given the qtile argument, thats why i was
 # getting find_or_run_current_group() takes 2 positional arguments but 3 were given
+# NOTE: This code was partially inspired by https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 @lazy.function
 def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
+    """
+    opens a solitary instance of an application in the specified group, if no group is specified the current group is used
+    Switches to specified group and if it is not open in that group, open it and focus it, if that application is open focus it
+    TODO: The focusing on the window doesn't work yet
+    """
     if (group_name is None):
         current_group = get_current_group()
         current_group = current_group.name
@@ -92,34 +97,6 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
     # If we're here, the app wasn't found in the group name, so switch to that group and spawn it
     qtile.current_screen.set_group(qtile.groups_map[current_group])
     qtile.spawn(app_name)
-
-#TODO: Would like to add a mouse warping feature
-# you can find the wm_class by using the xprop command in terminal
-def find_or_run_group_based(app, wm_class,group_name):
-    """
-    if an application is not in the specified group, go to that group and open the application, otherwise go to that group and focus that application
-    """
-    def __inner(qtile):
-        # # Get the window objects from windows_map
-        for window in qtile.groups_map[group_name].windows:
-
-            # Check if the window matches your desired class
-            if hasattr(window, "match") and window.match(Match(wm_class=wm_class)):
-
-                # Switch to the group where the window is
-                qtile.current_screen.set_group(window.group)
-
-                # Focus the window
-                #WARNING: I don't know if this value should be true or false, i switched it to true
-                window.focus(True)
-                return
-
-        # If we're here, the app wasn't found in the group name, so switch to that screen and spawn it
-        # qtile.current_screen.toggle_group(qtile.groups_map[group_name])
-        qtile.current_screen.set_group(qtile.groups_map[group_name])
-        qtile.cmd_spawn(app)
-
-    return __inner
 
 # https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 def find_or_run(app, wm_class):
@@ -201,9 +178,9 @@ keys = [
     Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
     # open firefox if not found in current group, called by widget
     # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
-    Key([mod, "control", "mod1"], "b", lazy.function(find_or_run_group_based("thunderbird","thunderbird", "4"))),
-    Key([mod, "control", "mod1"], "c", lazy.function(find_or_run_group_based("code","code-oss", "2"))),
-    Key([mod], "t", lazy.function(find_or_run_group_based("firefox","firefox", "2"))),
+    Key([mod, "control", "mod1"], "b", open_solitary_instance("thunderbird", "thunderbird", "4")),
+    Key([mod, "control", "mod1"], "c", open_solitary_instance("code","code-oss", "2")),
+    Key([mod], "t", open_solitary_instance("firefox", "firefox", "2")),
     Key([mod], "b", open_solitary_instance("firefox", "firefox")),
 ]
 # to swith back to last group
