@@ -69,18 +69,16 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
     """
     opens a solitary instance of an application in the specified group, if no group is specified the current group is used
     Switches to specified group and if it is not open in that group, open it and focus it, if that application is open focus it
-    TODO: The focusing on the window doesn't work yet, I think I need a mouse warp to do this
+    TODO: The focusing on the window does work, but the highlight indicated doesn't change, I think I need a mouse warp to do this
     """
+
+    # gets the current group
     if (group_name is None):
-        current_group = get_current_group()
-        current_group = current_group.name
-        f = open("/home/dahle/Desktop/Personal/qtile.txt","w")
-        # f.write("hello there\n")
-        f.write(str(current_group))
-        f.close()
+        current_group = get_current_group().name
     else:
         current_group = group_name
 
+    # loops through the windows in the current group
     for window in qtile.groups_map[current_group].windows:
 
         # Check if the window matches your desired class
@@ -90,8 +88,7 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
             qtile.current_screen.set_group(window.group)
 
             # Focus the window
-            #WARNING: I don't know if this value should be true or false, i switched it to true
-            window.focus(True)
+            window.focus(False)
             return
 
     # If we're here, the app wasn't found in the group name, so switch to that group and spawn it
