@@ -60,7 +60,8 @@ def get_current_group():
     returns the name of the current group
     """
     return qtile.current_screen.group
-
+# NOTE: Only updating current group on qtile reload, that means this function is being evaluated
+# and then passed into the lazy function
 def find_or_run_current_group(app_name, wm_class):
     current_group = get_current_group()
     current_group = current_group.name
