@@ -52,6 +52,9 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
 def latest_group(qtile):
     qtile.current_screen.set_group(qtile.current_screen.previous_group)
 
+def remove_string(text):
+    return ""
+
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
 # not working, seems to only run the conidtional that i put in the keybind when
@@ -367,34 +370,33 @@ screens = [
                 widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"a")}),
                 widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control","mod1"], "c")}),
                 widget.TextBox(text="󰨲",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"b")}),
-                widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
-                widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
-                widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
-                widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
-                widget.Prompt(),
-                # widget.WindowName(),
-                widget.Chord(
-                    chords_colors={
-                        "launch": ("#ff0000", "#ffffff"),
-                    },
-                    name_transform=lambda name: name.upper(),
-                ),
-                # widget.TextBox("default config", name="default"),
-                # widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
-                # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
-                # widget.StatusNotifier(),
+                widget.WidgetBox(text_closed='󰧚', text_open='󰧘',**decor_green2, widgets = [
+                    widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
+                    widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
+                    widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
+                    widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
+        ]),
+                # has a ton of empty space to the left
+                widget.WidgetBox(text_closed='', text_open='',widgets=[
+                    widget.TaskList(parse_text=remove_string, border="3a383d"),
+        ]),
                 widget.Spacer(),
                 widget.Battery(
                     format='{char} {percent:2.0%} {hour:d}:{min:02d}',
                     **decor_pink,
                     ),
                 widget.ThermalZone(**decor_pink),
-                widget.TextBox(text="󰍶",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
-                widget.TextBox(text="󰤄",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
+                widget.WidgetBox(close_button_location='right', text_closed='', text_open='', **decor_pink2, widgets = [
+                    widget.TextBox(text="󰍶",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
+                    widget.TextBox(text="󰤄",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
+        ]),
+                # widget.WidgetBox(widgets=[
+        # ]),
                 widget.Sep(linewidth=2),
                 widget.Systray(),
                 widget.Sep(linewidth=2),
                 widget.CheckUpdates(distro='Arch', no_update_string='Update: 0', **decor_green),
+                # widget.Clipboard(**decor_green),
                 widget.Volume(**decor_green),
                 widget.Sep(linewidth=2),
                 widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp),
