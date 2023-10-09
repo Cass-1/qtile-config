@@ -340,6 +340,7 @@ decor_gray = {
 }
 
 #NOTE: Screens
+widget_app_bar = widget.WidgetBox(text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
 screens = [
     Screen(
         top=bar.Bar(
@@ -376,10 +377,7 @@ screens = [
                     widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
                     widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
         ]),
-                # has a ton of empty space to the left
-                widget.WidgetBox(text_closed='', text_open='',widgets=[
-                    widget.TaskList(parse_text=remove_string, border="3a383d"),
-        ]),
+                widget_app_bar,
                 widget.Spacer(),
                 widget.Battery(
                     format='{char} {percent:2.0%} {hour:d}:{min:02d}',
@@ -417,3 +415,4 @@ screens = [
 @hook.subscribe.startup_once
 def autostart():
     """Run at Qtile start"""
+    widget_app_bar.toggle()
