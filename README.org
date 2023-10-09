@@ -462,7 +462,13 @@ decor_gray = {
 *** Screen Setup (Bar)
 #+begin_src python
 #NOTE: Screens
-widget_app_bar = widget.WidgetBox(text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
+widget_script_box = widget.WidgetBox(text_closed='', text_open='',**decor_green2, widgets = [
+           widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
+           widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
+           widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
+           widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
+        ])
+widget_app_bar = widget.WidgetBox(text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
 screens = [
     Screen(
         top=bar.Bar(
@@ -487,18 +493,13 @@ screens = [
                 widget.CurrentLayout(**decor_pink),
                 widget.Sep(linewidth=2),
                 widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control", "mod1"], "d")}),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
+                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
                 # widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn([terminal, "-e", "nvim"])}),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("emacsclient -c -a '' ")}),
+                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.spawn("emacsclient -c -a '' ")}),
                 widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"a")}),
                 widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control","mod1"], "c")}),
                 widget.TextBox(text="󰨲",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"b")}),
-                widget.WidgetBox(text_closed='󰧚', text_open='󰧘',**decor_green2, widgets = [
-                    widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
-                    widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
-                    widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
-                    widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
-        ]),
+                widget_script_box,
                 widget_app_bar,
                 widget.Spacer(),
                 widget.Battery(
@@ -507,8 +508,9 @@ screens = [
                     ),
                 widget.ThermalZone(**decor_pink),
                 widget.WidgetBox(close_button_location='right', text_closed='', text_open='', **decor_pink2, widgets = [
-                    widget.TextBox(text="󰍶",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
-                    widget.TextBox(text="󰤄",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
+                    widget.TextBox(text="󰍶",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
+                    widget.TextBox(text="󰤄",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
+                    widget.TextBox(text="󰗽",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lazy.shutdown()}),
         ]),
                 # widget.WidgetBox(widgets=[
         # ]),
@@ -542,7 +544,14 @@ screens = [
 @hook.subscribe.startup_once
 def autostart():
     """Run at Qtile start"""
+    # toggles open the tasklist widget
+    # qtile.spawn("nigrogen")
+
+    # # starts emacs server
+    # qtile.spawn("sh emacs --daemon")
+    startup = os.path.expanduser('~/Desktop/Scripts/startup.sh')
+    subprocess.Popen([startup])
+
+    widget_script_box.toggle()
     widget_app_bar.toggle()
 #+end_src
-
-
