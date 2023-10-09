@@ -1,3 +1,63 @@
+#+title: Qtile Config
+#+DESCRIPTION: My personal qtile config
+#+AUTHOR: Cass Dahle
+#+PROPERTY: header-args :tangle config.py
+#+auto_tangle: t
+
+* TABLE OF CONTENTS :toc:
+- [[#contributors-and-license][CONTRIBUTORS AND LICENSE]]
+- [[#notes][NOTES]]
+  - [[#lazy-functions][Lazy Functions]]
+- [[#imports][IMPORTS]]
+- [[#helper-functions][HELPER FUNCTIONS]]
+  - [[#working-helper-functions][Working Helper Functions]]
+  - [[#clutter-helper-functions][Clutter Helper Functions]]
+- [[#keybindings][KEYBINDINGS]]
+  - [[#defaults][Defaults]]
+  - [[#personal][Personal]]
+- [[#groups][GROUPS]]
+  - [[#group-names-and-labels][Group Names and Labels]]
+  - [[#group-setup][Group Setup]]
+- [[#layouts][LAYOUTS]]
+  - [[#layout-styles][Layout Styles]]
+  - [[#floating-layouts][Floating Layouts]]
+- [[#screens][SCREENS]]
+  - [[#screen-1][Screen 1]]
+
+* CONTRIBUTORS AND LICENSE
+
+# Copyright (c) 2010 Aldo Cortesi
+# Copyright (c) 2010, 2014 dequis
+# Copyright (c) 2012 Randall Ma
+# Copyright (c) 2012-2014 Tycho Andersen
+# Copyright (c) 2012 Craig Barnes
+# Copyright (c) 2013 horsik
+# Copyright (c) 2013 Tao Sauvage
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+* NOTES
+** Lazy Functions
+*** Arguments
+- Lazy functions or functions that call lazy functions are given the qtile argument. This this is why the
+  error takes x positional arguments but x+1 were given can happen.
+* IMPORTS
+#+begin_src python
 from types import NoneType
 from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
@@ -7,11 +67,23 @@ from qtile_extras.widget.decorations import RectDecoration
 from qtile_extras import widget
 import subprocess, os,time
 
+#+end_src
+
+* HELPER FUNCTIONS
+** Working Helper Functions
+*** get_current_group()
+#+begin_src python
+
 def get_current_group():
     """
     returns the name of the current group
     """
     return qtile.current_screen.group
+
+#+end_src
+
+*** open_solitary_instance()
+#+begin_src python
 
 # NOTE: Lazy functions or functions that call lazy functions are given the qtile argument, thats why i was
 # getting find_or_run_current_group() takes 2 positional arguments but 3 were given
@@ -48,10 +120,17 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
     qtile.current_screen.set_group(qtile.groups_map[current_group])
     qtile.spawn(app_name)
 
+
+#+end_src
+*** latest_group()
+#+begin_src python
 # to swith back to last group
 def latest_group(qtile):
     qtile.current_screen.set_group(qtile.current_screen.previous_group)
-
+#+end_src
+** Clutter Helper Functions
+*** app_in_group()
+#+begin_src python
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
 # not working, seems to only run the conidtional that i put in the keybind when
@@ -68,11 +147,17 @@ def app_in_group(qtile, app: str):
     # f.write("didn't finda ya")
     # f.close()
     qtile.cmd_spawn(terminal)
-
+#+end_src
+*** warp_cursor_here_win()
+#+begin_src python
 def warp_cursor_here_win(win):
     if win is not None:
         win.window.warp_pointer(win.width // 2, win.height // 2)
 
+#+end_src
+
+*** find_or_run()
+#+begin_src python
 # https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 def find_or_run(app, wm_class):
     """
@@ -99,6 +184,9 @@ def find_or_run(app, wm_class):
         qtile.cmd_spawn(app)
 
     return __inner
+#+end_src
+*** move_next_screen2()
+#+begin_src python
 
 #HACK: move_next_screen2(), cool function that when called swaps the groups on screens
 def move_next_screen2():
@@ -118,6 +206,10 @@ def move_next_screen2():
             time.sleep(2)
 
     return _move_next_screen2
+#+end_src
+* KEYBINDINGS
+** Defaults
+#+begin_src python
 
 mod = "Mod4"
 terminal = guess_terminal()
@@ -160,6 +252,9 @@ keys = [
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+#+end_src
+** Personal
+#+begin_src python
 
     # Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
     # Key([mod], "r", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
@@ -180,6 +275,11 @@ keys = [
 
 keys += [Key([mod], "p", lazy.function(latest_group))]
 
+#+end_src
+* GROUPS
+** Group Names and Labels
+#+begin_src python
+
 # setting up group names and labels
 group_names = [
    ("1", {"label": ""}), # Hack Nerd Font
@@ -193,7 +293,9 @@ group_names = [
    ("9", {"label": "•"}), # Hack Nerd Font
    ("0", {"label": "•"}), # Hack Nerd Font
 ]
-
+#+end_src
+** Group Setup
+#+begin_src python
 # seting up groups
 codeoss_wn = 2
 discord_wn = 6
@@ -206,6 +308,11 @@ for g in groups:
         Key([mod, "shift"], g.name, lazy.window.togroup(g.name))
     )
 
+#+end_src
+
+* LAYOUTS
+** Layout Styles
+#+begin_src python
 layouts = [
     layout.Columns(margin_on_single=6, insert_position=1, border_focus_stack=["#a68fdb"],border_focus="#a68fdb",border_normal="#14023b", border_width=4, margin=6),
     # layout.MonadTall(border_focus="#edd6ff",border_normal="#14023b", border_width=4, margin=4),
@@ -222,6 +329,10 @@ layouts = [
     # layout.Zoomy(),
 ]
 
+#+end_src
+
+** Floating Layouts
+#+begin_src python
 #NOTE: Floating Layouts
 # Drag floating layouts.
 mouse = [
@@ -238,7 +349,7 @@ cursor_warp = False
 floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
-        *layout.Floating.default_float_rules,
+        ,*layout.Floating.default_float_rules,
         Match(wm_class="confirmreset"),  # gitk
         Match(wm_class="makebranch"),  # gitk
         Match(wm_class="maketag"),  # gitk
@@ -287,6 +398,12 @@ wmname = "LG3D"
 # @hook.subscribe.group_window_add
 # def switchtogroup(group, window):
 #   group.cmd_toscreen()
+#+end_src
+
+* SCREENS
+** Screen 1
+*** My Bar Decoration Groups
+#+begin_src python
 
 #HACK: My Colors
 barscaler = 18
@@ -336,6 +453,9 @@ decor_gray = {
     "padding":  barscaler/1.7142,
 }
 
+#+end_src
+*** Screen Setup (Bar)
+#+begin_src python
 #NOTE: Screens
 screens = [
     Screen(
@@ -386,7 +506,7 @@ screens = [
                 widget.Spacer(),
                 widget.Battery(
                     format='{char} {percent:2.0%} {hour:d}:{min:02d}',
-                    **decor_pink,
+                    ,**decor_pink,
                     ),
                 widget.ThermalZone(**decor_pink),
                 widget.TextBox(text="󰍶",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
@@ -411,3 +531,5 @@ screens = [
 
     ),
 ]
+
+#+end_src
