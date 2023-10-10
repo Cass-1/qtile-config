@@ -446,8 +446,4 @@ def autostart():
 @hook.subscribe.startup
 def run_every_startup():
     send_notification("qtile", "Startup")
-
-@hook.subscribe.startup_complete
-def every_startup():
-    send_notification("qtile", "Startup complete")
-    #qtile.simulate_keypress([mod], "0")
+    widget_app_bar.toggle()
