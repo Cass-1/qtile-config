@@ -143,6 +143,16 @@ def latest_group(qtile):
 def remove_string(text):
     return ""
 #+end_src
+*** open_in_group()
+#+begin_src python
+@lazy.function
+def open_in_group(qtile, app_name, group=None):
+    if group is None:
+        group = get_current_group().name
+    qtile.current_screen.set_group(qtile.groups_map[group])
+    qtile.spawn(app_name)
+
+#+end_src
 ** Clutter Helper Functions
 *** app_in_group()
 #+begin_src python
@@ -237,7 +247,7 @@ keys = [
     Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
     Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    Key([mod,"shift"], "space", lazy.layout.next(), desc="Move window focus to other window"),
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
     Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
@@ -277,18 +287,20 @@ keys = [
     Key([],"F4", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
     Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([mod], "f", lazy.window.toggle_floating()),
-    # this is for a widget to call
-    Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
+    Key([mod], "w", open_in_group("firefox","2")),
+    Key([mod], "Space", open_solitary_instance("discord","discord","4")),
+    Key([mod], "Backspace", lazy.function(go_to_group("5"))),
+    Key([mod], "p", lazy.function(latest_group)),
+         # this is for a widget to call
+    # Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
     # open firefox if not found in current group, called by widget
     # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
-    Key([mod, "control", "mod1"], "b", open_solitary_instance("thunderbird", "thunderbird", "4")),
-    Key([mod, "control", "mod1"], "c", open_solitary_instance("code","code-oss", "2")),
-    Key([mod, "control", "mod1"], "d", open_solitary_instance("firefox","firefox")),
-    Key([mod], "t", open_solitary_instance("firefox", "firefox", "2")),
-    Key([mod], "b", open_solitary_instance("firefox", "firefox")),
+    # Key([mod, "control", "mod1"], "b", open_solitary_instance("thunderbird", "thunderbird", "4")),
+    # Key([mod, "control", "mod1"], "c", open_solitary_instance("code","code-oss", "2")),
+    # Key([mod, "control", "mod1"], "d", open_solitary_instance("firefox","firefox")),
+    # Key([mod], "t", open_solitary_instance("firefox", "firefox", "2")),
+    # Key([mod], "b", open_solitary_instance("firefox", "firefox")),
 ]
-
-keys += [Key([mod], "p", lazy.function(latest_group))]
 
 #+end_src
 * GROUPS
@@ -321,6 +333,7 @@ def go_to_group(name: str):
 
 for i in groups:
     keys.append(Key([mod], i.name, lazy.function(go_to_group(i.name))))
+    keys.append(Key([mod, "shift"], i.name, lazy.window.togroup(i.name)))
 
 #+end_src
 
@@ -476,7 +489,7 @@ widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', te
 clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "Hack")
 
 groupbox_widget= widget.GroupBox(
-                    hide_unused=True,
+                    hide_unused=False,
                     highlight_color = ['282828'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
                     fontsize=12,
                     center_aligned=False,
