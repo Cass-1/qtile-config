@@ -79,6 +79,10 @@ def go_to_group(name: str):
 
     return _inner
 
+@lazy.function
+def lock_screen(qtile):
+    qtile.spawn("sh /home/dahle/.config/qtile/scripts/i3lock-pixilate.sh")
+
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
 # not working, seems to only run the conidtional that i put in the keybind when
@@ -198,6 +202,7 @@ keys = [
     Key([mod], "Space", open_solitary_instance("discord","discord","4")),
     Key([mod], "Backspace", lazy.function(go_to_group("5"))),
     Key([mod], "p", lazy.function(latest_group)),
+    Key([mod, "mod1"], "l", lock_screen()),
          # this is for a widget to call
     # Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
     # open firefox if not found in current group, called by widget
@@ -409,6 +414,7 @@ screen0 = Screen(
                     widget.TextBox(text="󰍶",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
                     widget.TextBox(text="󰤄",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
                     widget.TextBox(text="󰗽",fontsize=30, mouse_callbacks={"Button1": lazy.shutdown()}),
+                    widget.TextBox(text="󰌾",fontsize=30, mouse_callbacks={"Button1": lock_screen()}),
         ]),
                 # widget.WidgetBox(widgets=[
         # ]),
@@ -459,3 +465,19 @@ def autostart():
 def run_every_startup():
     send_notification("qtile", "Startup")
     widget_app_bar.toggle()
+
+unlocked = True
+
+@hook.subscribe.resume
+def lock_screen():
+    global unlocked
+    unlocked = True
+
+@hook.subscribe.suspend
+def lock_sceen():
+    global unlocked
+    if unlocked:
+        qtile.spawn("sh /home/dahle/.config/qtile/scripts/i3lock-pixilate.sh")
+        unlocked = False
+    # qtile.spawn("firefox");
+    # qtile.spawn("sh /home/dahle/.config/qtile/scripts/i3lock-pixilate.sh")
