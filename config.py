@@ -40,7 +40,7 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
             # Switch to the group where the window is
             qtile.current_screen.set_group(window.group)
 
-            # Focus the window
+            # Focus the window.
             window.focus(True)
 
             return
@@ -62,6 +62,22 @@ def open_in_group(qtile, app_name, group=None):
         group = get_current_group().name
     qtile.current_screen.set_group(qtile.groups_map[group])
     qtile.spawn(app_name)
+
+# from the qtile FAQ
+def go_to_group(name: str):
+    def _inner(qtile ) -> None:
+        if len(qtile.screens) == 1:
+            qtile.groups_map[name].toscreen()
+            return
+
+        if name in '12345':
+            qtile.focus_screen(0)
+            qtile.groups_map[name].toscreen()
+        else:
+            qtile.focus_screen(1)
+            qtile.groups_map[name].toscreen()
+
+    return _inner
 
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
@@ -204,20 +220,6 @@ groups = [
     Group(name="0", label="scrn2", screen_affinity=1),
 ]
 
-def go_to_group(name: str):
-    def _inner(qtile ) -> None:
-        if len(qtile.screens) == 1:
-            qtile.groups_map[name].toscreen()
-            return
-
-        if name in '12345':
-            qtile.focus_screen(0)
-            qtile.groups_map[name].toscreen()
-        else:
-            qtile.focus_screen(1)
-            qtile.groups_map[name].toscreen()
-
-    return _inner
 
 for i in groups:
     keys.append(Key([mod], i.name, lazy.function(go_to_group(i.name))))
