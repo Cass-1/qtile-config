@@ -287,10 +287,15 @@ keys += [Key([mod], "p", lazy.function(latest_group))]
 
 # setting up group names and labels
 group_names = [
-   ("1", {"label": "•"}), # Hack Nerd Font
-   ("2", {"label": "•"}), # Hack Nerd Font
-   ("3", {"label": "•"}), # Hack Nerd Font
-   ("4", {"label": "•"}), # Hack Nerd Font
+   ("1", {"label": "prim"}), # Hack Nerd Font
+   ("2", {"label": "www"}), # Hack Nerd Font
+   ("3", {"label": "term"}), # Hack Nerd Font
+   ("4", {"label": "comm"}), # Hack Nerd Font
+   ("5", {"label": "extra"}), # Hack Nerd Font
+   ("6", {"label": "extra"}), # Hack Nerd Font
+   ("7", {"label": "extra"}), # Hack Nerd Font
+   ("8", {"label": "extra"}), # Hack Nerd Font
+   ("9", {"label": "extra"}), # Hack Nerd Font
 ]
 #+end_src
 ** Group Setup
@@ -475,7 +480,7 @@ screens = [
                 widget.GroupBox(
                     hide_unused=True,
                     highlight_color = ['282828'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
-                    fontsize=30,
+                    fontsize=12,
                     center_aligned=False,
                     active='FFFFFF', # color that active windows make the text
                     borderwidth=4,
