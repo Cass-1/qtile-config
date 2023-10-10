@@ -184,30 +184,34 @@ keys = [
 
 keys += [Key([mod], "p", lazy.function(latest_group))]
 
-# setting up group names and labels
-group_names = [
-   ("1", {"label": "prim"}), # Hack Nerd Font
-   ("2", {"label": "www"}), # Hack Nerd Font
-   ("3", {"label": "term"}), # Hack Nerd Font
-   ("4", {"label": "comm"}), # Hack Nerd Font
-   ("5", {"label": "extra"}), # Hack Nerd Font
-   ("6", {"label": "extra"}), # Hack Nerd Font
-   ("7", {"label": "extra"}), # Hack Nerd Font
-   ("8", {"label": "extra"}), # Hack Nerd Font
-   ("9", {"label": "extra"}), # Hack Nerd Font
+groups = [
+    # Screen affinity here is used to make
+    # sure the groups startup on the right screens
+    Group(name="1", label="prim", screen_affinity=0),
+    Group(name="2", label="www", screen_affinity=0),
+    Group(name="3", label="term", screen_affinity=0),
+    Group(name="4", label="comm", screen_affinity=0),
+    Group(name="5", label="extra", screen_affinity=0),
+    Group(name="0", label="srcn2", screen_affinity=1),
 ]
 
-# seting up groups
-codeoss_wn = 2
-discord_wn = 6
-groups = [Group(name, **kwargs) for name, kwargs in group_names]
-for g in groups:
-    keys.append(
-        Key([mod], g.name, lazy.group[g.name].toscreen())
-    )
-    keys.append(
-        Key([mod, "shift"], g.name, lazy.window.togroup(g.name))
-    )
+def go_to_group(name: str):
+    def _inner(qtile ) -> None:
+        if len(qtile.screens) == 1:
+            qtile.groups_map[name].toscreen()
+            return
+
+        if name in '12345':
+            qtile.focus_screen(0)
+            qtile.groups_map[name].toscreen()
+        else:
+            qtile.focus_screen(1)
+            qtile.groups_map[name].toscreen()
+
+    return _inner
+
+for i in groups:
+    keys.append(Key([mod], i.name, lazy.function(go_to_group(i.name))))
 
 layouts = [
     layout.Columns(margin_on_single=6, insert_position=1, border_focus_stack=["#a68fdb"],border_focus="#a68fdb",border_normal="#14023b", border_width=4, margin=6),
@@ -291,13 +295,33 @@ wmname = "LG3D"
 # def switchtogroup(group, window):
 #   group.cmd_toscreen()
 
-#HACK: My Colors
 barscaler = 18
+
 widget_defaults = dict(
-    font="sans",
-    fontsize=barscaler,
-    padding=3,
+    font= "Hack",
+    fontsize=20 ,
 )
+
+widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
+clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "Hack")
+
+groupbox_widget= widget.GroupBox(
+                    hide_unused=True,
+                    highlight_color = ['282828'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
+                    fontsize=12,
+                    center_aligned=False,
+                    active='FFFFFF', # color that active windows make the text
+                    borderwidth=4,
+                    margin_y = 2,
+                    highlight_method='line',
+                    inactive='#666565', # color that inactive windows make the text
+                    # this_current_screen_border='#714acf',
+                    this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
+                    other_current_screen_border='#a68fdb',
+                    other_screen_border='#FFFFFF',
+                    this_screen_border='#a68fdb',
+                    )
+
 extension_defaults = widget_defaults.copy()
 
 decor_purp = {
@@ -339,41 +363,10 @@ decor_gray = {
     "padding":  barscaler/1.7142,
 }
 
-#NOTE: Screens
-widget_defaults = dict(
-    font= "Hack",
-    fontsize=20 ,
-
-)
-widget_script_box = widget.WidgetBox(text_closed='', text_open='',**decor_green2, widgets = [
-           widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
-           widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
-           widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
-           widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
-        ])
-widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
-screens = [
-    Screen(
+screen0 = Screen(
         top=bar.Bar(
             [
-                widget.GroupBox(
-                    hide_unused=True,
-                    highlight_color = ['282828'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
-                    fontsize=12,
-                    center_aligned=False,
-                    active='FFFFFF', # color that active windows make the text
-                    borderwidth=4,
-                    margin_y = 2,
-                    highlight_method='line',
-                    inactive='#666565', # color that inactive windows make the text
-                    # this_current_screen_border='#714acf',
-                    this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
-                    other_current_screen_border='#a68fdb',
-                    other_screen_border='#FFFFFF',
-                    this_screen_border='#a68fdb',
-
-
-                    ),
+                groupbox_widget,
                 widget.CurrentLayout(fontsize=12, ),
                 # widget.Sep(),
                 # widget_script_box,
@@ -387,7 +380,7 @@ screens = [
                 # widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control","mod1"], "c")}),
                 # widget.TextBox(text="󰨲",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"b")}),
                 widget_app_bar,
-                # widget.Spacer(),
+                widget.Spacer(),
                 widget.Battery(
                     format='{char} {percent:2.0%} ({hour:d}:{min:02d})',
                     **decor_pink2,
@@ -396,6 +389,11 @@ screens = [
                 widget.ThermalZone(**decor_pink),
                 widget.Sep(linewidth=2),
                 widget.WidgetBox(close_button_location='right', text_closed='', text_open='', widgets = [
+                    widget.TextBox(text="󰍺",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
+                    widget.TextBox(text="󰌵",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
+                    widget.TextBox(text="󱩌",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
+                    widget.TextBox(text="󱩍",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
+                    widget.Sep(linewidth=2),
                     widget.TextBox(text="󰍶",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
                     widget.TextBox(text="󰤄",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
                     widget.TextBox(text="󰗽",fontsize=30, mouse_callbacks={"Button1": lazy.shutdown()}),
@@ -404,7 +402,7 @@ screens = [
         # ]),
                 widget.Systray(),
                 widget.Sep(linewidth=2),
-                widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "Hack")
+                clock_widget,
             ],
             2*barscaler,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
@@ -416,8 +414,22 @@ screens = [
         # left=bar.Gap(10),
         # bottom=bar.Gap(10)
 
-    ),
-]
+    )
+
+screen1 = Screen(
+    # bar
+    top=bar.Bar([
+        groupbox_widget,
+        widget.Spacer(),
+        clock_widget,
+    ],
+    2*barscaler,
+    background='#3a383d',
+    )
+
+)
+
+screens = [screen0, screen1]
 
 @hook.subscribe.startup_once
 def autostart():
@@ -434,5 +446,4 @@ def autostart():
 
 @hook.subscribe.startup
 def run_every_startup():
-    widget_app_bar.toggle()
-    # send_notification("qtile", "Startup")
+    send_notification("qtile", "Startup")
