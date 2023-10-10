@@ -473,7 +473,7 @@ widget_script_box = widget.WidgetBox(text_closed='', text_open='',**decor_
            widget.TextBox(text="󱩌",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
            widget.TextBox(text="󱩍",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
         ])
-widget_app_bar = widget.WidgetBox(text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
+widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
 screens = [
     Screen(
         top=bar.Bar(
@@ -507,7 +507,6 @@ screens = [
                 # widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"a")}),
                 # widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control","mod1"], "c")}),
                 # widget.TextBox(text="󰨲",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"b")}),
-                widget.TextBox(text="", foreground='888888'),
                 widget_app_bar,
                 widget.Spacer(),
                 widget.Battery(
