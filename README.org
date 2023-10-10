@@ -287,16 +287,10 @@ keys += [Key([mod], "p", lazy.function(latest_group))]
 
 # setting up group names and labels
 group_names = [
-   ("1", {"label": ""}), # Hack Nerd Font
-   ("2", {"label": ""}), # Hack Nerd Font
+   ("1", {"label": "•"}), # Hack Nerd Font
+   ("2", {"label": "•"}), # Hack Nerd Font
    ("3", {"label": "•"}), # Hack Nerd Font
-   ("4", {"label": "󰨲"}), # Hack Nerd Font
-   ("5", {"label": "󰙯"}), # Hack Nerd Font
-   ("6", {"label": "•"}), # Hack Nerd Font
-   ("7", {"label": "•"}), # Not Sure, but was from a nerd font
-   ("8", {"label": "•"}), # Hack Nerd Font
-   ("9", {"label": "•"}), # Hack Nerd Font
-   ("0", {"label": "•"}), # Hack Nerd Font
+   ("4", {"label": "•"}), # Hack Nerd Font
 ]
 #+end_src
 ** Group Setup
@@ -462,6 +456,11 @@ decor_gray = {
 *** Screen Setup (Bar)
 #+begin_src python
 #NOTE: Screens
+widget_defaults = dict(
+    font= "Hack",
+    fontsize=20 ,
+
+)
 widget_script_box = widget.WidgetBox(text_closed='', text_open='',**decor_green2, widgets = [
            widget.TextBox(text="󰍺",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
            widget.TextBox(text="󰌵",fontsize=30,**decor_green2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
@@ -474,7 +473,7 @@ screens = [
         top=bar.Bar(
             [
                 widget.GroupBox(
-                    hide_unused=False,
+                    hide_unused=True,
                     highlight_color = ['282828', 'a888f7'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
                     fontsize=30,
                     active='FFFFFF', # color that active windows make the text
@@ -490,22 +489,25 @@ screens = [
 
                     ),
                 widget.Sep(),
+                widget_script_box,
+                widget.Sep(),
                 widget.CurrentLayout(**decor_pink),
                 widget.Sep(linewidth=2),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control", "mod1"], "d")}),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
-                # widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn([terminal, "-e", "nvim"])}),
-                widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.spawn("emacsclient -c -a '' ")}),
-                widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"a")}),
-                widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control","mod1"], "c")}),
-                widget.TextBox(text="󰨲",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"b")}),
-                widget_script_box,
+                # widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control", "mod1"], "d")}),
+                # widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/builds/tor-browser/qtile-tor-script.sh")}),
+                # # widget.TextBox(text="󰕷",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.cmd_spawn([terminal, "-e", "nvim"])}),
+                # widget.TextBox(text="",fontsize=30,**decor_green, mouse_callbacks={"Button1": lambda: qtile.spawn("emacsclient -c -a '' ")}),
+                # widget.TextBox(text="󰙯",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"a")}),
+                # widget.TextBox(text="󰨞",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod, "control","mod1"], "c")}),
+                # widget.TextBox(text="󰨲",fontsize=30,**decor_green, mouse_callbacks={"Button1": lazy.simulate_keypress([mod,"control","mod1"],"b")}),
+                widget.TextBox(text="", foreground='888888'),
                 widget_app_bar,
                 widget.Spacer(),
                 widget.Battery(
-                    format='{char} {percent:2.0%} {hour:d}:{min:02d}',
+                    format='{char} {percent:2.0%} ({hour:d}:{min:02d})',
                     ,**decor_pink,
                     ),
+                widget.BatteryIcon(theme_path="/home/dahle/.icons/qtile/battery/"),
                 widget.ThermalZone(**decor_pink),
                 widget.WidgetBox(close_button_location='right', text_closed='', text_open='', **decor_pink2, widgets = [
                     widget.TextBox(text="󰍶",fontsize=30,**decor_pink2, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
@@ -521,7 +523,7 @@ screens = [
                 # widget.Clipboard(**decor_green),
                 widget.Volume(**decor_green),
                 widget.Sep(linewidth=2),
-                widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp),
+                widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "Hack")
             ],
             2*barscaler,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
