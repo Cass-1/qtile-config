@@ -192,7 +192,7 @@ groups = [
     Group(name="3", label="term", screen_affinity=0),
     Group(name="4", label="comm", screen_affinity=0),
     Group(name="5", label="extra", screen_affinity=0),
-    Group(name="0", label="srcn2", screen_affinity=1),
+    Group(name="0", label="scrn2", screen_affinity=1),
 ]
 
 def go_to_group(name: str):
@@ -302,26 +302,6 @@ widget_defaults = dict(
     fontsize=20 ,
 )
 
-widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
-clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "Hack")
-
-groupbox_widget= widget.GroupBox(
-                    hide_unused=True,
-                    highlight_color = ['282828'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
-                    fontsize=12,
-                    center_aligned=False,
-                    active='FFFFFF', # color that active windows make the text
-                    borderwidth=4,
-                    margin_y = 2,
-                    highlight_method='line',
-                    inactive='#666565', # color that inactive windows make the text
-                    # this_current_screen_border='#714acf',
-                    this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
-                    other_current_screen_border='#a68fdb',
-                    other_screen_border='#FFFFFF',
-                    this_screen_border='#a68fdb',
-                    )
-
 extension_defaults = widget_defaults.copy()
 
 decor_purp = {
@@ -362,6 +342,26 @@ decor_gray = {
     ],
     "padding":  barscaler/1.7142,
 }
+
+widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
+clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "Hack")
+
+groupbox_widget= widget.GroupBox(
+                    hide_unused=True,
+                    highlight_color = ['282828'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
+                    fontsize=12,
+                    center_aligned=False,
+                    active='FFFFFF', # color that active windows make the text
+                    borderwidth=4,
+                    margin_y = 2,
+                    highlight_method='line',
+                    inactive='#666565', # color that inactive windows make the text
+                    # this_current_screen_border='#714acf',
+                    this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
+                    other_current_screen_border='#a68fdb',
+                    other_screen_border='#FFFFFF',
+                    this_screen_border='#a68fdb',
+                    )
 
 screen0 = Screen(
         top=bar.Bar(
@@ -442,8 +442,12 @@ def autostart():
     startup = os.path.expanduser('~/Desktop/Scripts/startup.sh')
     subprocess.Popen([startup])
 
-    widget_script_box.toggle()
 
 @hook.subscribe.startup
 def run_every_startup():
     send_notification("qtile", "Startup")
+
+@hook.subscribe.startup_complete
+def every_startup():
+    send_notification("qtile", "Startup complete")
+    #qtile.simulate_keypress([mod], "0")
