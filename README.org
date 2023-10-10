@@ -56,8 +56,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 * Screenshot
 ** Desktop Screenshot
-#+DOWNLOADED: screenshot @ 2023-10-09 18:38:33
-[[file:Screenshot/2023-10-09_18-38-33_screenshot.png]]
+#+DOWNLOADED: screenshot @ 2023-10-09 18:43:37
+[[file:Screenshot/2023-10-09_18-43-37_screenshot.png]]
 * NOTES
 ** Lazy Functions
 *** Arguments
