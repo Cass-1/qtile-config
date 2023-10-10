@@ -6,6 +6,7 @@ from libqtile.utils import guess_terminal
 from qtile_extras.widget.decorations import RectDecoration
 from qtile_extras import widget
 import subprocess, os,time
+from libqtile.utils import send_notification   # e.g. send_notification("qtile", "Startup") will send the notification *qtile*\n "startup"
 
 def get_current_group():
     """
@@ -434,4 +435,8 @@ def autostart():
     subprocess.Popen([startup])
 
     widget_script_box.toggle()
+
+@hook.subscribe.startup
+def run_every_startup():
     widget_app_bar.toggle()
+    # send_notification("qtile", "Startup")
