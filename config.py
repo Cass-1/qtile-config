@@ -205,6 +205,11 @@ keys = [
     Key([mod, "mod1"], "l", lock_screen()),
     Key([mod], "t", lazy.widget["tool_widgetbox"].toggle()),
     Key([mod], "o", lazy.widget["user_options_widgetbox"].toggle()),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse sset Master 5%+"), desc="Increace Volume by 5%"),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse sset Master 5%-"), desc="Decrease Volume by 5%"),
+    Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse sset Master toggle"), desc="Toggle Volume"),
+    Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 10%-"), desc="Decreace brightness by 10%"),
+    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set 10%+"), desc="Increace brightness by 10%"),
          # this is for a widget to call
     # Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
     # open firefox if not found in current group, called by widget
@@ -395,6 +400,7 @@ tool_widgetbox = widget.WidgetBox(name="tool_widgetbox",close_button_location='r
 user_options_widgetbox = widget.WidgetBox(name="user_options_widgetbox",close_button_location='right', text_closed='', text_open='', widgets = [
                             widget.Sep(linewidth=2),
                             widget.TextBox(text="󰍶",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
+                            widget.TextBox(text="",fontsize=15, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/reboot.sh")}),
                             widget.TextBox(text="󰤄",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
                             widget.TextBox(text="󰗽",fontsize=30, mouse_callbacks={"Button1": lazy.shutdown()}),
                             widget.TextBox(text="󰌾",fontsize=30, mouse_callbacks={"Button1": lock_screen()}),
