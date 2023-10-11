@@ -161,7 +161,7 @@ keys = [
     Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
     Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod,"shift"], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
     Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
@@ -199,10 +199,12 @@ keys = [
     Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([mod], "f", lazy.window.toggle_floating()),
     Key([mod], "w", open_in_group("firefox","2")),
-    Key([mod], "Space", open_solitary_instance("discord","discord","4")),
+    Key(["Control", "Shift"], "Space", open_solitary_instance("discord","discord","4")),
     Key([mod], "Backspace", lazy.function(go_to_group("5"))),
     Key([mod], "p", lazy.function(latest_group)),
     Key([mod, "mod1"], "l", lock_screen()),
+    Key([mod], "t", lazy.widget["tool_widgetbox"].toggle()),
+    Key([mod], "o", lazy.widget["user_options_widgetbox"].toggle()),
          # this is for a widget to call
     # Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
     # open firefox if not found in current group, called by widget
@@ -222,7 +224,7 @@ groups = [
     Group(name="3", label="term", screen_affinity=0),
     Group(name="4", label="comm", screen_affinity=0),
     Group(name="5", label="extra", screen_affinity=0),
-    Group(name="0", label="scrn2", screen_affinity=1),
+    Group(name="0", label="scrn", screen_affinity=1),
 ]
 
 
@@ -366,7 +368,7 @@ clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "
 groupbox_widget= widget.GroupBox(
                     hide_unused=False,
                     highlight_color = ['282828'], # Active group highlight color when using 'line' highlight method. Gradient when two colors
-                    fontsize=12,
+                    fontsize=15,
                     center_aligned=False,
                     active='FFFFFF', # color that active windows make the text
                     borderwidth=4,
@@ -380,11 +382,30 @@ groupbox_widget= widget.GroupBox(
                     this_screen_border='#a68fdb',
                     )
 
+
+tool_widgetbox = widget.WidgetBox(name="tool_widgetbox",close_button_location='right', text_closed='', text_open='', widgets = [
+                    widget.Pomodoro(fontsize=15,color_inactive="FFFFFF", color_active="FFFFFF", color_break="FFFFFF"),
+                    widget.TextBox(text="󰍺",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
+                    widget.TextBox(text="󰌵",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
+                    widget.TextBox(text="󱩌",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
+                    widget.TextBox(text="󱩍",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
+                    widget.Sep(linewidth=2),
+                ])
+
+user_options_widgetbox = widget.WidgetBox(name="user_options_widgetbox",close_button_location='right', text_closed='', text_open='', widgets = [
+                            widget.Sep(linewidth=2),
+                            widget.TextBox(text="󰍶",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
+                            widget.TextBox(text="󰤄",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
+                            widget.TextBox(text="󰗽",fontsize=30, mouse_callbacks={"Button1": lazy.shutdown()}),
+                            widget.TextBox(text="󰌾",fontsize=30, mouse_callbacks={"Button1": lock_screen()}),
+                            widget.Sep(linewidth=2),
+                        ])
+
 screen0 = Screen(
         top=bar.Bar(
             [
                 groupbox_widget,
-                widget.CurrentLayout(fontsize=12, ),
+                widget.CurrentLayout(fontsize=15),
                 # widget.Sep(),
                 # widget_script_box,
                 # widget.Sep(),
@@ -405,17 +426,8 @@ screen0 = Screen(
                 # widget.BatteryIcon(theme_path="/home/dahle/.icons/qtile/battery/"),
                 widget.ThermalZone(**decor_pink),
                 widget.Sep(linewidth=2),
-                widget.WidgetBox(close_button_location='right', text_closed='', text_open='', widgets = [
-                    widget.TextBox(text="󰍺",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/Monitor-Left.sh")}),
-                    widget.TextBox(text="󰌵",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_clear.sh")}),
-                    widget.TextBox(text="󱩌",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_low.sh")}),
-                    widget.TextBox(text="󱩍",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/redshift_high.sh")}),
-                    widget.Sep(linewidth=2),
-                    widget.TextBox(text="󰍶",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/poweroff.sh")}),
-                    widget.TextBox(text="󰤄",fontsize=30, mouse_callbacks={"Button1": lambda: qtile.spawn("sh /home/dahle/Desktop/Scripts/sleep.sh")}),
-                    widget.TextBox(text="󰗽",fontsize=30, mouse_callbacks={"Button1": lazy.shutdown()}),
-                    widget.TextBox(text="󰌾",fontsize=30, mouse_callbacks={"Button1": lock_screen()}),
-        ]),
+                tool_widgetbox,
+                user_options_widgetbox,
                 # widget.WidgetBox(widgets=[
         # ]),
                 widget.Systray(),
