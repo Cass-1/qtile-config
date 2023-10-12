@@ -53,6 +53,10 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
 def latest_group(qtile):
     qtile.current_screen.set_group(qtile.current_screen.previous_group)
 
+@lazy.function
+def latest_group_lazy(qtile):
+    qtile.current_screen.set_group(qtile.current_screen.previous_group)
+
 def remove_string(text):
     return ""
 
@@ -82,6 +86,45 @@ def go_to_group(name: str):
 @lazy.function
 def lock_screen(qtile):
     qtile.spawn("sh /home/dahle/.config/qtile/scripts/i3lock-pixilate.sh")
+
+@lazy.function
+def toggle_group(qtile, group_name):
+    if get_current_group().name is group_name:
+        # go to previous group
+        latest_group(qtile)
+    else:
+        # go to group
+        qtile.groups_map[group_name].toscreen()
+
+@lazy.function
+def open_app_group_toggle(qtile, app_name, app_wmclass, group_name):
+    """
+        toggles back and forth between a specific group and opens an app in that group
+        if that app is not already open
+    """
+    if get_current_group().name is group_name:
+        # go to previous group
+        # return lazy.function(lambda qtile: qtile.current_screen.set_group(qtile.current_screen.previous_group))
+        latest_group(qtile)
+    else:
+        # go to group
+        # loops through the windows in the current group
+        for window in qtile.groups_map[group_name].windows:
+
+            # Check if the window matches your desired class
+            if hasattr(window, "match") and window.match(Match(wm_class=app_wmclass)):
+
+                # Switch to the group where the window is
+                qtile.current_screen.set_group(window.group)
+
+                # Focus the window.
+                window.focus(True)
+
+                return
+
+        # If we're here, the app wasn't found in the group name, so switch to that group and spawn it
+        qtile.current_screen.set_group(qtile.groups_map[group_name])
+        qtile.spawn(app_name)
 
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
@@ -156,18 +199,21 @@ terminal = guess_terminal()
 keys = [
     # A list of available commands that can be bound to keys can be found
     # at https://docs.qtile.org/en/latest/manual/config/lazy.html
+
     # Switch between windows
     Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
     Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
     Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    # Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
     Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
     Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
     Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+
     # Grow windows. If current window is on the edge of screen and direction
     # will be to screen edge - window would shrink.
     Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
@@ -175,6 +221,7 @@ keys = [
     Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
     Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with
@@ -185,40 +232,49 @@ keys = [
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack",
     ),
-    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-    Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
+
+    # Qtile
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
 
-    # Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
-    # Key([mod], "r", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
+    # Rofi
     Key([mod], "Backslash", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([],"F4", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
     Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
-    Key([mod], "f", lazy.window.toggle_floating()),
+
+    # App launchers
+    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     Key([mod], "w", open_in_group("firefox","2")),
-    Key(["Control", "Shift"], "Space", open_solitary_instance("discord","discord","4")),
-    Key([mod], "Backspace", lazy.function(go_to_group("5"))),
+    # Key([mod], "Space", open_solitary_instance("discord","discord","4")),
+    Key([mod], "Space", open_app_group_toggle("discord", "discord", "4")),
+    Key([mod], "e", lazy.spawn("emacsclient -c -a ''")),
+
+
+    # Screen navigation
+    # Key([mod], "Backspace", lazy.function(go_to_group("5"))),
+    Key([mod], "Backspace", toggle_group("5")),
     Key([mod], "p", lazy.function(latest_group)),
-    Key([mod, "mod1"], "l", lock_screen()),
+
+    # Window commands
+    Key([mod], "f", lazy.window.toggle_floating()),
+    Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
+
+    # Bar slider toggle
     Key([mod], "t", lazy.widget["tool_widgetbox"].toggle()),
     Key([mod], "o", lazy.widget["user_options_widgetbox"].toggle()),
+
+    # Lock screen
+    Key([mod, "mod1"], "l", lock_screen()),
+
+    # Media keys
     Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse sset Master 5%+"), desc="Increace Volume by 5%"),
     Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse sset Master 5%-"), desc="Decrease Volume by 5%"),
     Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse sset Master toggle"), desc="Toggle Volume"),
     Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 10%-"), desc="Decreace brightness by 10%"),
     Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set 10%+"), desc="Increace brightness by 10%"),
-         # this is for a widget to call
-    # Key([mod, "control", "mod1"], "a", lazy.group["5"].toscreen(), lazy.spawn("discord")),
-    # open firefox if not found in current group, called by widget
-    # Key([mod, "control", "mod1"], "b", lazy.spawn(terminal) if(app_in_group("firefox") is 1) else lazy.spawn("firefox")),
-    # Key([mod, "control", "mod1"], "b", open_solitary_instance("thunderbird", "thunderbird", "4")),
-    # Key([mod, "control", "mod1"], "c", open_solitary_instance("code","code-oss", "2")),
-    # Key([mod, "control", "mod1"], "d", open_solitary_instance("firefox","firefox")),
-    # Key([mod], "t", open_solitary_instance("firefox", "firefox", "2")),
-    # Key([mod], "b", open_solitary_instance("firefox", "firefox")),
 ]
 
 groups = [
