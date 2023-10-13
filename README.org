@@ -418,7 +418,8 @@ for i in groups:
 layouts = [
     layout.Columns(margin_on_single=6, insert_position=1, border_focus_stack=["#a68fdb"],border_focus="#a68fdb",border_normal="#14023b", border_width=4, margin=6),
     # layout.MonadTall(border_focus="#edd6ff",border_normal="#14023b", border_width=4, margin=4),
-    layout.Max(border_focus="#a68fdb",border_normal="#14023b",border_width=6, margin=6),
+    # layout.Max(border_focus="#a68fdb",border_normal="#14023b",border_width=6, margin=6),
+    layout.Max(),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
     # layout.Bsp(),
