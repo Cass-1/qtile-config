@@ -8,6 +8,21 @@ from qtile_extras import widget
 import subprocess, os,time
 from libqtile.utils import send_notification   # e.g. send_notification("qtile", "Startup") will send the notification *qtile*\n "startup"
 
+# can't use hexidecimals w/ 0x bc it is different than the hexidecimal colors that start with #
+
+# my fav color scheme
+# accent_color = "#a68fdb"  # light purple
+# secondary_accent_color = "#D17B8C" # maroonish pink (goes with purple)
+# secondary_accent_color_dif = "#D17B8D" # maroonish pink (goes with purple)
+
+accent_color = "#758D72"  # gray purple
+secondary_accent_color = "#8A728D"  # mint
+secondary_accent_color_dif = "#8A728E"  # mint
+
+time_and_date_color = accent_color
+power_color = secondary_accent_color
+power_color2 = secondary_accent_color_dif
+
 def get_current_group():
     """
     returns the name of the current group
@@ -74,12 +89,16 @@ def go_to_group(name: str):
             qtile.groups_map[name].toscreen()
             return
 
-        if name in '12345':
-            qtile.focus_screen(0)
-            qtile.groups_map[name].toscreen()
-        else:
-            qtile.focus_screen(1)
-            qtile.groups_map[name].toscreen()
+        num = qtile.groups_map[name].screen_affinity
+        qtile.focus_screen(num)
+        qtile.groups_map[name].toscreen()
+
+        # if name in '12345':
+        #     qtile.focus_screen(0)
+        #     qtile.groups_map[name].toscreen()
+        # else:
+        #     qtile.focus_screen(1)
+        #     qtile.groups_map[name].toscreen()
 
     return _inner
 
@@ -243,7 +262,7 @@ keys = [
     # Rofi
     Key([mod], "Backslash", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
     Key([],"F4", lazy.spawn("rofi -theme mysidebar.rasi -show drun")),
-    Key([],"F8", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
+    Key([],"F10", lazy.spawn("rofi -theme mysidebar.rasi -show window")),
 
     # App launchers
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
@@ -260,6 +279,7 @@ keys = [
 
     # Window commands
     Key([mod], "f", lazy.window.toggle_floating()),
+    Key([mod, "shift"], "tab", lazy.window.toggle_fullscreen()),
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
 
     # Bar slider toggle
@@ -291,13 +311,16 @@ groups = [
 
 for i in groups:
     keys.append(Key([mod], i.name, lazy.function(go_to_group(i.name))))
+    # keys.append(Key([mod], i.name, lazy.group[i.name].toscreen()))
     keys.append(Key([mod, "shift"], i.name, lazy.window.togroup(i.name)))
 
+# fun color (mint): #B4F8C8
 layouts = [
-    layout.Columns(margin_on_single=6, insert_position=1, border_focus_stack=["#a68fdb"],border_focus="#a68fdb",border_normal="#14023b", border_width=4, margin=6),
+    layout.Columns(name="colums-m", border_focus_stack=[accent_color],border_focus=accent_color,border_width=1),
     # layout.MonadTall(border_focus="#edd6ff",border_normal="#14023b", border_width=4, margin=4),
     # layout.Max(border_focus="#a68fdb",border_normal="#14023b",border_width=6, margin=6),
     layout.Max(),
+    # layout.Columns(margin_on_single=6, insert_position=1, border_focus_stack=[accent_color],border_focus=accent_color,border_normal=accent_color, border_width=4, margin=6),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
     # layout.Bsp(),
@@ -335,7 +358,7 @@ floating_layout = layout.Floating(
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class="yad")  # yad
     ],
-    border_focus = "a68fdb",border_normal="#14023b",border_width=6
+    border_focus = accent_color,border_normal=accent_color,border_width=6
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
@@ -424,8 +447,30 @@ decor_gray = {
     "padding":  barscaler/1.7142,
 }
 
-widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d")])
-clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_purp,font= "Hack")
+decor_time_and_date= {
+    "decorations": [
+        RectDecoration(colour=time_and_date_color, radius=3, filled=True, padding=barscaler/4, group=True)
+    ],
+    "padding": barscaler/1.7142,
+}
+
+decor_power= {
+    "decorations": [
+        RectDecoration(colour=power_color, radius=3, filled=True, padding=barscaler/4, group=True)
+    ],
+    "padding":  barscaler/1.7142,
+}
+
+# if i want two same colored blocks next to eachother but don't want those two blocks to connect
+decor_power2= {
+    "decorations": [
+        RectDecoration(colour=power_color2, radius=3, filled=True, padding=barscaler/4, group=True)
+    ],
+    "padding":  barscaler/1.7142,
+}
+
+widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d" )])
+clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_time_and_date,font= "Hack")
 
 groupbox_widget= widget.GroupBox(
                     hide_unused=False,
@@ -438,10 +483,11 @@ groupbox_widget= widget.GroupBox(
                     highlight_method='line',
                     inactive='#666565', # color that inactive windows make the text
                     # this_current_screen_border='#714acf',
-                    this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
-                    other_current_screen_border='#a68fdb',
-                    other_screen_border='#FFFFFF',
-                    this_screen_border='#a68fdb',
+                    # this_current_screen_border='#a888f7', # border or line color for group on this screen when unfocused
+                    this_current_screen_border = accent_color,
+                    other_current_screen_border= accent_color,
+                    other_screen_border='#FFFFFF',  # screen boarder when unfocused
+                    this_screen_border='#FFFFFF',  # screen boarder when unfocused
                     )
 
 
@@ -484,10 +530,10 @@ screen0 = Screen(
                 widget.Spacer(),
                 widget.Battery(
                     format='{char} {percent:2.0%} ({hour:d}:{min:02d})',
-                    **decor_pink2,
+                    **decor_power,
                     ),
                 # widget.BatteryIcon(theme_path="/home/dahle/.icons/qtile/battery/"),
-                widget.ThermalZone(**decor_pink),
+                widget.ThermalZone(**decor_power2),
                 widget.Sep(linewidth=2),
                 tool_widgetbox,
                 user_options_widgetbox,
@@ -534,12 +580,28 @@ def autostart():
     # qtile.spawn("sh emacs --daemon")
     startup = os.path.expanduser('~/Desktop/Scripts/startup.sh')
     subprocess.Popen([startup])
+    volume_icon = os.path.expanduser('~/Desktop/Scripts/volume.sh')
+    subprocess.Popen([volume_icon])
+    emacs_daemon = os.path.expanduser('~/Desktop/Scripts/emacs_daemon.sh')
+    subprocess.Popen([emacs_daemon])
 
 
 @hook.subscribe.startup
 def run_every_startup():
     send_notification("qtile", "Startup")
     widget_app_bar.toggle()
+
+# warps the mouse to the screen if the group is on another screen then the currently focused one
+# https://github.com/qtile/qtile/issues/3929#issuecomment-1293427000
+@hook.subscribe.startup_complete
+def assign_groups_to_screens():
+    try:
+        for i in groups:
+            name = i.name
+            num = qtile.groups_map[name].screen_affinity
+            qtile.groups_map[name].toscreen(num)
+    except IndexError:
+        pass
 
 unlocked = True
 
