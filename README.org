@@ -444,7 +444,7 @@ groups = [
     Group(name="2", label="www", screen_affinity=0),
     Group(name="3", label="term", screen_affinity=0),
     Group(name="4", label="comm", screen_affinity=0),
-    Group(name="5", label="extra", screen_affinity=0),
+    Group(name="5", label="extra", screen_affinity=0, spawn="thunderbird"),
     Group(name="0", label="scrn", screen_affinity=1),
 ]
 
@@ -768,28 +768,6 @@ def run_every_startup():
     # opens the application tray
     widget_app_bar.toggle()
 
-# warps the mouse to the screen if the group is on another screen then the currently focused one
-# https://github.com/qtile/qtile/issues/3929#issuecomment-1293427000
-# @hook.subscribe.startup_complete
-# def assign_groups_to_screens():
-#     """
-#     assign's the groups to screens, a workaround recommened in a github issue request
-#     """
-#     try:
-#         for i in groups:
-#             name = i.name
-#             num = qtile.groups_map[name].screen_affinity
-#             qtile.groups_map[name].toscreen(num)
-#     except IndexError:
-#         pass
-
-@hook.subscribe.startup_complete
-def start_thunderbird():
-    group = qtile.groups_map["5"]
-    qtile.current_screen.set_group(group)
-    # qtile.spawn("thunderbird")
-    # group = qtile.groups_map["1"]
-    # qtile.current_screen.set_group(group)
 #+end_src
 
 ** Lock Screen
