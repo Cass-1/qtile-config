@@ -407,6 +407,8 @@ keys = [
     # Media keys
     Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse sset Master 5%+"), desc="Increace Volume by 5%"),
     Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse sset Master 5%-"), desc="Decrease Volume by 5%"),
+    Key(["shift"], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse sset Master 1%+"), desc="Increace Volume by 1%"),
+    Key(["shift"], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse sset Master 1%-"), desc="Decrease Volume by 1%"),
     Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse sset Master toggle"), desc="Toggle Volume"),
     Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 10%-"), desc="Decreace brightness by 10%"),
     Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set 10%+"), desc="Increace brightness by 10%"),
