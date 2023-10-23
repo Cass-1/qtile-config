@@ -60,8 +60,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 * SCREENSHOT
 ** Desktop Screenshot
-#+DOWNLOADED: screenshot @ 2023-10-09 18:43:37
-[[file:Screenshot/2023-10-09_18-43-37_screenshot.png]]
+#+DOWNLOADED: screenshot @ 2023-10-22 17:23:01
+[[file:SCREENSHOT/2023-10-22_17-23-01_screenshot.png]]
+
 * NOTES
 ** Lazy Functions
 *** Arguments
