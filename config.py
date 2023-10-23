@@ -89,16 +89,23 @@ def go_to_group(name: str):
             qtile.groups_map[name].toscreen()
             return
 
-        num = qtile.groups_map[name].screen_affinity
-        qtile.focus_screen(num)
-        qtile.groups_map[name].toscreen()
+        # the target group
+        group = qtile.groups_map[name]
 
-        # if name in '12345':
-        #     qtile.focus_screen(0)
-        #     qtile.groups_map[name].toscreen()
-        # else:
-        #     qtile.focus_screen(1)
-        #     qtile.groups_map[name].toscreen()
+        # the index of the target group's prefered screen in the screens list
+        num = qtile.groups_map[name].screen_affinity
+
+        # save the index of the screen before the move to the target group
+        old_screen_index = qtile.current_screen.index
+
+        # set the screen
+        qtile.screens[num].set_group(group)
+        qtile.focus_screen(n=num, warp=True)
+
+        # warp to screen always recenters the mouse, this way the mouse is only recentered
+        # when changing screens
+        if num is not old_screen_index:
+            qtile.warp_to_screen()
 
     return _inner
 
@@ -573,15 +580,16 @@ screens = [screen0, screen1]
 @hook.subscribe.startup_once
 def autostart():
     """Run at Qtile start"""
-    # toggles open the tasklist widget
-    # qtile.spawn("nigrogen")
-
-    # # starts emacs server
-    # qtile.spawn("sh emacs --daemon")
+    # run my startup script
     startup = os.path.expanduser('~/Desktop/Scripts/startup.sh')
     subprocess.Popen([startup])
+
+    # PROCESSES THAT DON'T WORK IN STARTUP SCRIPT
+    # run the volume icon applet
     volume_icon = os.path.expanduser('~/Desktop/Scripts/volume.sh')
     subprocess.Popen([volume_icon])
+
+    # start the emacs daemon
     emacs_daemon = os.path.expanduser('~/Desktop/Scripts/emacs_daemon.sh')
     subprocess.Popen([emacs_daemon])
 
@@ -589,19 +597,33 @@ def autostart():
 @hook.subscribe.startup
 def run_every_startup():
     send_notification("qtile", "Startup")
+
+
+    # opens the application tray
     widget_app_bar.toggle()
 
 # warps the mouse to the screen if the group is on another screen then the currently focused one
 # https://github.com/qtile/qtile/issues/3929#issuecomment-1293427000
+# @hook.subscribe.startup_complete
+# def assign_groups_to_screens():
+#     """
+#     assign's the groups to screens, a workaround recommened in a github issue request
+#     """
+#     try:
+#         for i in groups:
+#             name = i.name
+#             num = qtile.groups_map[name].screen_affinity
+#             qtile.groups_map[name].toscreen(num)
+#     except IndexError:
+#         pass
+
 @hook.subscribe.startup_complete
-def assign_groups_to_screens():
-    try:
-        for i in groups:
-            name = i.name
-            num = qtile.groups_map[name].screen_affinity
-            qtile.groups_map[name].toscreen(num)
-    except IndexError:
-        pass
+def start_thunderbird():
+    group = qtile.groups_map["5"]
+    qtile.current_screen.set_group(group)
+    # qtile.spawn("thunderbird")
+    # group = qtile.groups_map["1"]
+    # qtile.current_screen.set_group(group)
 
 unlocked = True
 
