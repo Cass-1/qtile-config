@@ -1,0 +1,3 @@
+* Inbox
+** [2023-10-21 Sat 00:04] Working on colors, i want to make a section where all the colors are stored so it is easy to change color pallets without having to dig through all of the different individual classes and their arguments
+[[file:~/.config/qtile/README.org::*COLORS][COLORS]]

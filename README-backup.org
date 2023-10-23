@@ -1,3 +1,76 @@
+#+title: Qtile Config
+#+DESCRIPTION: My personal qtile config
+#+AUTHOR: Cass Dahle
+#+STARTUP: overview
+#+PROPERTY: header-args :tangle config.py
+#+auto_tangle: t
+
+
+* TABLE OF CONTENTS :toc:
+- [[#contributors-and-license][CONTRIBUTORS AND LICENSE]]
+- [[#screenshot][SCREENSHOT]]
+  - [[#desktop-screenshot][Desktop Screenshot]]
+- [[#notes][NOTES]]
+  - [[#lazy-functions][Lazy Functions]]
+  - [[#screen-affinity][Screen Affinity]]
+- [[#imports][IMPORTS]]
+- [[#colors][COLORS]]
+- [[#helper-functions][HELPER FUNCTIONS]]
+  - [[#working-helper-functions][Working Helper Functions]]
+  - [[#clutter-helper-functions][Clutter Helper Functions]]
+- [[#keybindings][KEYBINDINGS]]
+- [[#groups][GROUPS]]
+- [[#layouts][LAYOUTS]]
+  - [[#layout-styles][Layout Styles]]
+  - [[#floating-layouts][Floating Layouts]]
+- [[#screens][SCREENS]]
+  - [[#general][General]]
+  - [[#screen-0][Screen 0]]
+  - [[#screen-1][Screen 1]]
+  - [[#initializing-screens][Initializing Screens]]
+- [[#hooks][HOOKS]]
+  - [[#startup-hooks][Startup Hooks]]
+  - [[#lock-screen][Lock Screen]]
+
+* CONTRIBUTORS AND LICENSE
+Copyright (c) 2010 Aldo Cortesi
+Copyright (c) 2010, 2014 dequis
+Copyright (c) 2012 Randall Ma
+Copyright (c) 2012-2014 Tycho Andersen
+Copyright (c) 2012 Craig Barnes
+Copyright (c) 2013 horsik
+Copyright (c) 2013 Tao Sauvage
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+* SCREENSHOT
+** Desktop Screenshot
+#+DOWNLOADED: screenshot @ 2023-10-09 18:43:37
+[[file:Screenshot/2023-10-09_18-43-37_screenshot.png]]
+* NOTES
+** Lazy Functions
+*** Arguments
+- Lazy functions or functions that call lazy functions are given the qtile argument. This this is why the
+  error takes x positional arguments but x+1 were given can happen.
+** Screen Affinity
+I don't totally understand it yet but i gave the group scrn2 screen affinity for screen1. When I use scrn2's keybinding it will always open on screen1 and not screen0.
+* IMPORTS
+#+begin_src python
 from types import NoneType
 from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
@@ -7,7 +80,9 @@ from qtile_extras.widget.decorations import RectDecoration
 from qtile_extras import widget
 import subprocess, os,time
 from libqtile.utils import send_notification   # e.g. send_notification("qtile", "Startup") will send the notification *qtile*\n "startup"
-
+#+end_src
+* COLORS
+#+begin_src python
 # can't use hexidecimals w/ 0x bc it is different than the hexidecimal colors that start with #
 
 # my fav color scheme
@@ -22,12 +97,22 @@ secondary_accent_color_dif = "#8A728E"  # mint
 time_and_date_color = accent_color
 power_color = secondary_accent_color
 power_color2 = secondary_accent_color_dif
+#+end_src
+* HELPER FUNCTIONS
+** Working Helper Functions
+*** get_current_group()
+#+begin_src python
 
 def get_current_group():
     """
     returns the name of the current group
     """
     return qtile.current_screen.group
+
+#+end_src
+
+*** open_solitary_instance()
+#+begin_src python
 
 # NOTE: Lazy functions or functions that call lazy functions are given the qtile argument, thats why i was
 # getting find_or_run_current_group() takes 2 positional arguments but 3 were given
@@ -64,6 +149,10 @@ def open_solitary_instance(qtile, app_name, wm_class, group_name=None):
     qtile.current_screen.set_group(qtile.groups_map[current_group])
     qtile.spawn(app_name)
 
+
+#+end_src
+*** latest_group()
+#+begin_src python
 # to swith back to last group
 def latest_group(qtile):
     qtile.current_screen.set_group(qtile.current_screen.previous_group)
@@ -71,10 +160,14 @@ def latest_group(qtile):
 @lazy.function
 def latest_group_lazy(qtile):
     qtile.current_screen.set_group(qtile.current_screen.previous_group)
-
+#+end_src
+*** remove_string()
+#+begin_src python
 def remove_string(text):
     return ""
-
+#+end_src
+*** open_in_group()
+#+begin_src python
 @lazy.function
 def open_in_group(qtile, app_name, group=None):
     if group is None:
@@ -82,6 +175,9 @@ def open_in_group(qtile, app_name, group=None):
     qtile.current_screen.set_group(qtile.groups_map[group])
     qtile.spawn(app_name)
 
+#+end_src
+*** go_to_group()
+#+begin_src python
 # from the qtile FAQ
 def go_to_group(name: str):
     def _inner(qtile ) -> None:
@@ -101,11 +197,15 @@ def go_to_group(name: str):
         #     qtile.groups_map[name].toscreen()
 
     return _inner
-
+#+end_src
+*** lock_screen()
+#+begin_src python
 @lazy.function
 def lock_screen(qtile):
     qtile.spawn("sh /home/dahle/.config/qtile/scripts/i3lock-pixilate.sh")
-
+#+end_src
+*** group_toggle()
+#+begin_src python
 @lazy.function
 def toggle_group(qtile, group_name):
     if get_current_group().name is group_name:
@@ -114,7 +214,9 @@ def toggle_group(qtile, group_name):
     else:
         # go to group
         qtile.groups_map[group_name].toscreen()
-
+#+end_src
+*** open_app_group_toggle()
+#+begin_src python
 @lazy.function
 def open_app_group_toggle(qtile, app_name, app_wmclass, group_name):
     """
@@ -144,7 +246,10 @@ def open_app_group_toggle(qtile, app_name, app_wmclass, group_name):
         # If we're here, the app wasn't found in the group name, so switch to that group and spawn it
         qtile.current_screen.set_group(qtile.groups_map[group_name])
         qtile.spawn(app_name)
-
+#+end_src
+** Clutter Helper Functions
+*** app_in_group()
+#+begin_src python
 # given an application name, search the current group's window list for that application name
 # if found return 1, else return 0
 # not working, seems to only run the conidtional that i put in the keybind when
@@ -161,11 +266,17 @@ def app_in_group(qtile, app: str):
     # f.write("didn't finda ya")
     # f.close()
     qtile.cmd_spawn(terminal)
-
+#+end_src
+*** warp_cursor_here_win()
+#+begin_src python
 def warp_cursor_here_win(win):
     if win is not None:
         win.window.warp_pointer(win.width // 2, win.height // 2)
 
+#+end_src
+
+*** find_or_run()
+#+begin_src python
 # https://www.reddit.com/r/qtile/comments/tmsgf8/custom_function_help_run_or_raise_application/
 def find_or_run(app, wm_class):
     """
@@ -192,6 +303,9 @@ def find_or_run(app, wm_class):
         qtile.cmd_spawn(app)
 
     return __inner
+#+end_src
+*** move_next_screen2()
+#+begin_src python
 
 #HACK: move_next_screen2(), cool function that when called swaps the groups on screens
 def move_next_screen2():
@@ -211,6 +325,9 @@ def move_next_screen2():
             time.sleep(2)
 
     return _move_next_screen2
+#+end_src
+* KEYBINDINGS
+#+begin_src python
 
 mod = "Mod4"
 terminal = guess_terminal()
@@ -297,6 +414,9 @@ keys = [
     Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set 10%+"), desc="Increace brightness by 10%"),
 ]
 
+#+end_src
+* GROUPS
+#+begin_src python
 groups = [
     # Screen affinity here is used to make
     # sure the groups startup on the right screens
@@ -314,6 +434,11 @@ for i in groups:
     # keys.append(Key([mod], i.name, lazy.group[i.name].toscreen()))
     keys.append(Key([mod, "shift"], i.name, lazy.window.togroup(i.name)))
 
+#+end_src
+
+* LAYOUTS
+** Layout Styles
+#+begin_src python
 # fun color (mint): #B4F8C8
 layouts = [
     layout.Columns(name="colums-m", border_focus_stack=[accent_color],border_focus=accent_color,border_width=1),
@@ -333,6 +458,10 @@ layouts = [
     # layout.Zoomy(),
 ]
 
+#+end_src
+
+** Floating Layouts
+#+begin_src python
 #NOTE: Floating Layouts
 # Drag floating layouts.
 mouse = [
@@ -349,7 +478,7 @@ cursor_warp = False
 floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
-        *layout.Floating.default_float_rules,
+        ,*layout.Floating.default_float_rules,
         Match(wm_class="confirmreset"),  # gitk
         Match(wm_class="makebranch"),  # gitk
         Match(wm_class="maketag"),  # gitk
@@ -398,14 +527,21 @@ wmname = "LG3D"
 # @hook.subscribe.group_window_add
 # def switchtogroup(group, window):
 #   group.cmd_toscreen()
+#+end_src
 
+* SCREENS
+** General
+*** Widget Defaults
+#+begin_src python
 barscaler = 18
 
 widget_defaults = dict(
     font= "Hack",
     fontsize=20 ,
 )
-
+#+end_src
+*** Widget Decorations
+#+begin_src python
 extension_defaults = widget_defaults.copy()
 
 decor_purp = {
@@ -469,6 +605,10 @@ decor_power2= {
     "padding":  barscaler/1.7142,
 }
 
+#+end_src
+*** Widgets
+#+begin_src python
+
 widget_app_bar = widget.WidgetBox(fontshadow= "888888", text_closed='', text_open='',widgets=[widget.TaskList(parse_text=remove_string, border="3a383d" )])
 clock_widget = widget.Clock(format="%Y-%m-%d    %I:%M %p",  **decor_time_and_date,font= "Hack")
 
@@ -510,6 +650,9 @@ user_options_widgetbox = widget.WidgetBox(name="user_options_widgetbox",close_bu
                             widget.Sep(linewidth=2),
                         ])
 
+#+end_src
+** Screen 0
+#+begin_src python
 screen0 = Screen(
         top=bar.Bar(
             [
@@ -530,7 +673,7 @@ screen0 = Screen(
                 widget.Spacer(),
                 widget.Battery(
                     format='{char} {percent:2.0%} ({hour:d}:{min:02d})',
-                    **decor_power,
+                    ,**decor_power,
                     ),
                 # widget.BatteryIcon(theme_path="/home/dahle/.icons/qtile/battery/"),
                 widget.ThermalZone(**decor_power2),
@@ -555,6 +698,11 @@ screen0 = Screen(
 
     )
 
+
+#+end_src
+
+** Screen 1
+#+begin_src python
 screen1 = Screen(
     # bar
     top=bar.Bar([
@@ -567,9 +715,14 @@ screen1 = Screen(
     )
 
 )
-
+#+end_src
+** Initializing Screens
+#+begin_src python
 screens = [screen0, screen1]
-
+#+end_src
+* HOOKS
+** Startup Hooks
+#+begin_src python
 @hook.subscribe.startup_once
 def autostart():
     """Run at Qtile start"""
@@ -603,6 +756,10 @@ def assign_groups_to_screens():
     except IndexError:
         pass
 
+#+end_src
+
+** Lock Screen
+#+begin_src python :session hook
 unlocked = True
 
 @hook.subscribe.resume
@@ -618,3 +775,5 @@ def lock_sceen():
         unlocked = False
     # qtile.spawn("firefox");
     # qtile.spawn("sh /home/dahle/.config/qtile/scripts/i3lock-pixilate.sh")
+#+end_src
+
