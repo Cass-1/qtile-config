@@ -1,9 +1,30 @@
+* Table of Contents :toc:
+- [[#qtile-notes][Qtile Notes]]
+  - [[#lazy-functions][Lazy Functions]]
+  - [[#screen-affinity][Screen Affinity]]
+  - [[#mouse][Mouse]]
+  - [[#groups][Groups]]
+- [[#inbox][Inbox]]
+  - [[#2023-10-21-sat-0004-working-on-colors][[2023-10-21 Sat 00:04] Working on colors]]
+
+* Qtile Notes
+** Lazy Functions
+*** Arguments
+- Lazy functions or functions that call lazy functions are given the qtile argument. This this is why the
+  error takes x positional arguments but x+1 were given can happen.
+** Screen Affinity
+I don't totally understand it yet but i gave the group scrn2 screen affinity for screen1. When I use scrn2's keybinding it will always open on screen1 and not screen0.
+** Mouse
+*** qtile.warp_to_screen()
+- warps the mouse to the center of the current screen
+- screenshot of code
+ [[file:NOTES/2023-10-22_22-26-28_screenshot.png]]
+** Groups
+*** Accessing a group by name
+- qtile.groups_map[name]
+- where name is a string like "1"
+
 * Inbox
-** TODO [2023-10-22 Sun] Trying to Open App on Startup
-- I want to open thunderbird in group 5 (extra) on startup
-- i was going to use open_in_group, however it is a lazy function
-- i made the function not lazy but then i ran into issues
-  + this was even after removing qtile from the arguments
-[[file:~/.config/qtile/README.org::*open_in_group()][open_in_group()]]
-** [2023-10-21 Sat 00:04] Working on colors, i want to make a section where all the colors are stored so it is easy to change color pallets without having to dig through all of the different individual classes and their arguments
+** [2023-10-21 Sat 00:04] Working on colors
+- i want to make a section where all the colors are stored so it is easy to change color pallets without having to dig through all of the different individual classes and their arguments
 [[file:~/.config/qtile/README.org::*COLORS][COLORS]]

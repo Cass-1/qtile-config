@@ -10,18 +10,13 @@
 - [[#contributors-and-license][CONTRIBUTORS AND LICENSE]]
 - [[#screenshot][SCREENSHOT]]
   - [[#desktop-screenshot][Desktop Screenshot]]
-- [[#notes][NOTES]]
-  - [[#lazy-functions][Lazy Functions]]
-  - [[#screen-affinity][Screen Affinity]]
-  - [[#mouse][Mouse]]
-  - [[#groups][Groups]]
 - [[#imports][IMPORTS]]
 - [[#colors][COLORS]]
 - [[#helper-functions][HELPER FUNCTIONS]]
   - [[#working-helper-functions][Working Helper Functions]]
   - [[#clutter-helper-functions][Clutter Helper Functions]]
 - [[#keybindings][KEYBINDINGS]]
-- [[#groups-1][GROUPS]]
+- [[#groups][GROUPS]]
 - [[#layouts][LAYOUTS]]
   - [[#layout-styles][Layout Styles]]
   - [[#floating-layouts][Floating Layouts]]
@@ -64,23 +59,6 @@ SOFTWARE.
 ** Desktop Screenshot
 #+DOWNLOADED: screenshot @ 2023-10-22 17:23:01
 [[file:SCREENSHOT/2023-10-22_17-23-01_screenshot.png]]
-
-* NOTES
-** Lazy Functions
-*** Arguments
-- Lazy functions or functions that call lazy functions are given the qtile argument. This this is why the
-  error takes x positional arguments but x+1 were given can happen.
-** Screen Affinity
-I don't totally understand it yet but i gave the group scrn2 screen affinity for screen1. When I use scrn2's keybinding it will always open on screen1 and not screen0.
-** Mouse
-*** qtile.warp_to_screen()
-- warps the mouse to the center of the current screen
-- screenshot of code
- [[file:NOTES/2023-10-22_22-26-28_screenshot.png]]
-** Groups
-*** Accessing a group by name
-- qtile.groups_map[name]
-- where name is a string like "1"
 
 * IMPORTS
 #+begin_src python
